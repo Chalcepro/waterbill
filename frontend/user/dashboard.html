@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WaterBill NG</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Header Styling */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #2e6fff, #1a2746);
+            color: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(46,111,255,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-container img {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+        }
+
+        .logo-container h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: #023e8a;
+            color: white;
+            padding-top: 60px;
+            transition: 0.3s;
+            z-index: 999;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #0077b6;
+        }
+
+        .sidebar.show {
+            left: 0;
+        }
+
+        /* Overlay for sidebar */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 998;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            /* Only hide a top navigation if present; do not hide all navs */
+            header nav {
+                display: none;
+            }
+            .hamburger {
+                display: block;
+            }
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #11c0d4 0%, #08a9d4 40%, #04a0c9 60%, #039ed1 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dashboard-content {
+            padding: 24px 16px 160px 16px; /* leave room for raised footer */
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* Circular Gauge */
+        .gauge-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 8px 0 18px 0;
+        }
+        .gauge {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(60% 60% at 50% 50%, #2b3b4a 0%, #273645 70%, #22303e 100%);
+            box-shadow: inset 0 6px 24px rgba(0,0,0,0.35), 0 10px 24px rgba(0,0,0,0.25);
+        }
+        .gauge svg { position:absolute; inset:0; transform: rotate(-90deg); }
+        .gauge .label-days {
+            position: absolute; top: 68px; left: 0; right: 0; text-align:center; color: #eaf2ff;
+            font-weight:800; font-size: 40px; letter-spacing: 1px;
+        }
+        .gauge .label-percent {
+            position: absolute; bottom: 36px; left: 0; right: 0; text-align:center; color: #bfe7ff;
+            font-weight:700; font-size: 22px;
+        }
+        .gauge .dot { position:absolute; width:14px; height:14px; background:#fff; border-radius:50%; box-shadow:0 0 0 6px rgba(255,255,255,0.15); }
+        .gauge .dot.start { left: 24px; bottom: 64px; }
+        .gauge .dot.end { right: 24px; bottom: 64px; }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #2e6fff, #1a2746);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(46,111,255,0.2);
+        }
+
+        .welcome-section h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .welcome-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 18px;
+            box-shadow: 0 6px 25px rgba(46,111,255,0.08);
+            text-align: center;
+            border: 1px solid #f0f4ff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(46,111,255,0.15);
+        }
+
+        .stat-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #2e6fff;
+            margin-bottom: 12px;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .action-card i {
+            font-size: 2.5rem;
+            color: #2e6fff;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Bottom Navigation injected by mobile-footer.js -->
+    
+
+    <div class="sidebar" id="sidebar">
+        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="payment.html"><i class="fas fa-credit-card"></i> Make Payment</a>
+        <a href="history.html"><i class="fas fa-history"></i> Payment History</a>
+        <a href="report-fault.html"><i class="fas fa-exclamation-triangle"></i> Report Fault</a>
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="dashboard-content">
+        <div class="gauge-wrap">
+            <div class="gauge">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <linearGradient id="gradRed" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#ff4d4f"/>
+                            <stop offset="100%" stop-color="#ff6b6b"/>
+                        </linearGradient>
+                        <linearGradient id="gradBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#29b6f6"/>
+                            <stop offset="100%" stop-color="#2e6fff"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- background ring -->
+                    <circle cx="50" cy="50" r="44" stroke="#1f2a36" stroke-width="10" fill="none"/>
+                    <!-- progress ring -->
+                    <circle id="gaugeProgress" cx="50" cy="50" r="44" stroke="url(#gradBlue)" stroke-width="10" fill="none"
+                            stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="0" />
+                </svg>
+                <div class="label-days"><span id="daysRemaining">--</span> DYS</div>
+                <div class="label-percent"><span id="percentRemaining">--</span>%</div>
+                <div class="dot start"></div>
+                <div class="dot end"></div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="subscription-status">Loading...</div>
+                <div class="stat-label">Subscription Status</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="subscription-end">Loading...</div>
+                <div class="stat-label">Subscription Ends</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pending-payments">Loading...</div>
+                <div class="stat-label">Pending Payments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-paid">Loading...</div>
+                <div class="stat-label">Total Paid This Year</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <a href="payment.html" class="action-card">
+                <i class="fas fa-credit-card"></i>
+                <h3>Make Payment</h3>
+                <p>Pay your water bill</p>
+            </a>
+            <a href="history.html" class="action-card">
+                <i class="fas fa-history"></i>
+                <h3>Payment History</h3>
+                <p>View past payments</p>
+            </a>
+            <a href="report-fault.html" class="action-card">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Report Fault</h3>
+                <p>Report water issues</p>
+            </a>
+            <a href="profile.html" class="action-card">
+                <i class="fas fa-user"></i>
+                <h3>Profile</h3>
+                <p>Update your details</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (window.AuthGuard) {
+                const session = await AuthGuard.requireUser();
+                if (!session) return; // redirected
+            } else {
+                await checkAuth();
+            }
+            loadDashboardData();
+            setupSidebar();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('../../api/auth/check-session.php', { credentials: 'include' });
+                const result = await response.json();
+                
+                const allowedRoles = ['user', 'tenant', 'landlord'];
+                if (!result.authenticated || !allowedRoles.includes((result.role || '').toLowerCase())) {
+                    if (window.notify) notify.warn('Please log in to continue');
+                    window.location.href = '../auth/login.html';
+                    return;
+                }
+                document.getElementById('user-name').textContent = result.name || 'User';
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = '../auth/login.html';
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('../../api/user/dashboard-data.php', { credentials: 'include' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('subscription-status').textContent = data.subscription_status || 'Inactive';
+                    document.getElementById('subscription-end').textContent = data.subscription_end || 'N/A';
+                    document.getElementById('pending-payments').textContent = data.pending_payments || '0';
+                    document.getElementById('total-paid').textContent = '₦' + (data.total_paid || '0');
+
+                    // Update gauge from subscription_end
+                    updateGaugeFromDate(data.subscription_end);
+                }
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+                // Show fallback data on error
+                document.getElementById('subscription-status').textContent = 'Error loading';
+                document.getElementById('subscription-end').textContent = 'Error loading';
+                document.getElementById('pending-payments').textContent = 'Error loading';
+                document.getElementById('total-paid').textContent = 'Error loading';
+            }
+        }
+
+        // Robust gauge updater
+        function updateGaugeFromDate(endDate) {
+            const daysSpan = document.getElementById('daysRemaining');
+            const percentSpan = document.getElementById('percentRemaining');
+            const circle = document.getElementById('gaugeProgress');
+            const CIRC = 2 * Math.PI * 44; // r=44
+            let days = 0;
+            let valid = false;
+            if (endDate && typeof endDate === 'string') {
+                const end = new Date(endDate);
+                if (!isNaN(end.getTime())) {
+                    const now = new Date();
+                    days = Math.max(0, Math.ceil((end - now) / (1000*60*60*24)));
+                    valid = true;
+                }
+            }
+            const cycleDays = 30;
+            const percent = valid ? Math.max(0, Math.min(100, Math.round((days / cycleDays) * 100))) : 0;
+            const offset = CIRC * (1 - percent/100);
+            if (circle) {
+                circle.setAttribute('stroke-dasharray', CIRC.toFixed(2));
+                circle.setAttribute('stroke-dashoffset', offset.toFixed(2));
+            }
+            if (daysSpan) daysSpan.textContent = valid ? String(days) : '--';
+            if (percentSpan) percentSpan.textContent = valid ? String(percent) : '--';
+        }
+
+        async function logout() {
+            try {
+                await fetch('../../api/auth/logout.php', { method: 'POST', credentials: 'include' });
+                window.location.href = '../auth/login.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+                window.location.href = '../auth/login.html';
+            }
+        }
+
+        function setupSidebar() {
+            const menuBtn = document.getElementById('menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if (menuBtn && sidebar && overlay) {
+                menuBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('show');
+                    overlay.classList.toggle('show');
+                });
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('show');
+                    overlay.classList.remove('show');
+                });
+            }
+        }
+    </script>
+    <script src="../assets/js/notify.js"></script>
+    <script src="../assets/js/auth-guard.js"></script>
+    <script src="../assets/js/mobile-footer.js"></script>
+    <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

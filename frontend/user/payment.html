@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Payment - WaterBill NG</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            /* Modern color palette */
+            --primary-50: #f0f9ff;
+            --primary-100: #e0f2fe;
+            --primary-200: #bae6fd;
+            --primary-300: #7dd3fc;
+            --primary-400: #38bdf8;
+            --primary-500: #0ea5e9;
+            --primary-600: #0284c7;
+            --primary-700: #0369a1;
+            --primary-800: #075985;
+            --primary-900: #0c4a6e;
+            
+            --secondary-100: #f0fdf4;
+            --secondary-400: #4ade80;
+            --secondary-600: #16a34a;
+            
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --border-radius-sm: 0.375rem;
+            --border-radius: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-2xl: 1.5rem;
+            
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            --max-width: 80rem;
+            --header-height: 4rem;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: var(--transition);
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            border: none;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+            background: var(--primary-color);
+        }
+
+        /* Layout */
+        .container {
+            width: 100%;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .payment-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        
+        @media (min-width: 1200px) {
+            .payment-container {
+                padding: 0;
+            }
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .page-header h1 {
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .card-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--gray-100);
+            background-color: var(--gray-50);
+        }
+        
+        .payment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-card-header {
+            padding: 1.75rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .payment-card-header h2 {
+            color: white;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .payment-card-header p {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0.5rem 0 0;
+            font-size: 0.95rem;
+        }
+
+        .payment-card-body {
+            padding: 2rem;
+        }
+
+        /* Payment Options */
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .payment-option {
+            position: relative;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 1.75rem 1.5rem;
+            background: white;
+            cursor: pointer;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        
+        .payment-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-500);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .payment-option:hover {
+            border-color: var(--primary-300);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .payment-option.selected {
+            border-color: var(--primary-500);
+            background-color: var(--primary-50);
+        }
+        
+        .payment-option.selected::before {
+            transform: scaleX(1);
+        }
+        
+        .payment-option i {
+            font-size: 2rem;
+            color: var(--primary-600);
+            margin-bottom: 1rem;
+            display: inline-flex;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-100);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .payment-option:hover i {
+            background: var(--primary-500);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .payment-option {
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 2rem 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .payment-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+        
+        .payment-option:hover::before {
+            transform: scaleX(1);
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(46, 111, 255, 0.1);
+        }
+
+        .payment-option.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-light);
+        }
+
+        .payment-option i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.25rem;
+            display: inline-flex;
+            width: 70px;
+            height: 70px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .payment-option:hover i {
+            background: var(--gradient-primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .payment-option h3 {
+            margin: 0 0 0.5rem;
+            color: var(--text-dark);
+            font-size: 1.25rem;
+        }
+
+        .payment-option p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 0.9375rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: white;
+            color: var(--gray-800);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px var(--primary-100);
+            outline: none;
+        }
+        
+        .form-control::placeholder {
+            color: var(--gray-400);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary-600);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(14 165 239 / 0.3), 0 2px 4px -2px rgb(14 165 239 / 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-700);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgb(14 165 239 / 0.3), 0 4px 6px -4px rgb(14 165 239 / 0.3);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        /* Payment Form */
+        .payment-form {
+            margin: 3rem 0;
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+
+        .form-section {
+            padding: 2.5rem;
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+            position: relative;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: #f9fafc;
+            height: auto;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(46, 111, 255, 0.25);
+            outline: none;
+        }
+        
+        .form-control::placeholder {
+            color: #a0aec0;
+            opacity: 1;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1a56d6;
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        /* Summary Section */
+        .payment-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius-lg);
+            margin-top: 3rem;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-label {
+            color: var(--gray-600);
+        }
+        
+        .summary-value {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+        
+        .summary-total {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--gray-200);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-700);
+        }
+        
+        .summary-total .summary-value {
+            font-size: 1.25rem;
+            color: var(--primary-700);
+        }
+        
+        .payment-summary h4 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--border-color);
+            align-items: center;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            padding-top: 0.5rem;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .summary-total {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border-color);
+        }
+        
+        .summary-total .summary-value {
+            font-size: 1.4rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .payment-method-details {
+            background: #f9fafc;
+            border-radius: var(--border-radius);
+            padding: 1.75rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .payment-method-details::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-primary);
+        }
+
+        .payment-method-details h4 {
+            margin-top: 0;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert {
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .alert i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+            position: relative;
+            top: 2px;
+        }
+
+        .alert-info {
+            background-color: #f0f7ff;
+            color: #0c63e4;
+            border-color: #b8daff;
+        }
+        
+        .alert-success {
+            background-color: #f0fdf4;
+            color: #166534;
+            border-color: #86efac;
+        }
+        
+        .alert-warning {
+            background-color: #fffbeb;
+            color: #854d0e;
+            border-color: #fcd34d;
+        }
+        
+        .alert-danger {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .payment-options {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .payment-container {
+                padding: 1rem;
+            }
+            
+            .card-header, .card-body, .card-footer {
+                padding: 1.25rem;
+            }
+            
+            .form-section {
+                padding: 1.25rem;
+            }
+            
+            .payment-summary {
+                padding: 1.5rem;
+                margin-top: 2rem;
+            }
+            
+            .summary-total {
+                font-size: 1.125rem;
+            }
+            
+            .summary-total .summary-value {
+                font-size: 1.125rem;
+            }
+            
+            .btn {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.9375rem;
+            }
+        }
+        
+        /* Animation for payment method selection */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+        }
+        
+        .payment-option.selected {
+            border-color: var(--primary-color);
+            background-color: #f8faff;
+            animation: pulse 1s;
+        }
+        
+        /* Custom checkbox style */
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        /* Loading spinner */
+        .spinner-border {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-width: 0.15em;
+            margin-right: 0.5rem;
+        }
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #2e6fff;
+            box-shadow: 0 0 0 2px rgba(46, 111, 255, 0.2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #2e6fff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #1a2746;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .subscription-info {
+            background: #f8faff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2e6fff;
+        }
+
+        /* File Upload Styles */
+        .file-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .file-upload:hover, .file-upload.highlight {
+            border-color: #2e6fff;
+            background-color: #f0f7ff;
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 10px;
+            cursor: pointer;
+            color: #2e6fff;
+            font-weight: 500;
+        }
+        
+        .file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <header class="page-header">
+            <h1>Make a Payment</h1>
+            <p>Choose your preferred payment method and complete your transaction securely</p>
+        </header>
+        
+        <div class="payment-card">
+            <div class="payment-card-header">
+                <h2 class="mb-0">Payment Options</h2>
+                <p class="text-muted mb-0">Select your preferred payment method</p>
+            </div>
+            <div class="payment-card-body">
+                <div class="payment-options">
+                    <div class="payment-option" data-method="card" onclick="selectPaymentMethod('card')">
+                        <i class="fas fa-credit-card"></i>
+                        <h3>Credit/Debit Card</h3>
+                        <p>Pay instantly with your card</p>
+                    </div>
+                    <div class="payment-option" data-method="bank" onclick="selectPaymentMethod('bank')">
+                        <i class="fas fa-university"></i>
+                        <h3>Bank Transfer</h3>
+                        <p>Transfer from your bank account</p>
+                    </div>
+                    <div class="payment-option" data-method="wallet" onclick="selectPaymentMethod('wallet')">
+                        <i class="fas fa-wallet"></i>
+                        <h3>Wallet Balance</h3>
+                        <p>Use your available balance</p>
+                    </div>
+                    <div class="payment-option" data-method="receipt" onclick="selectPaymentMethod('receipt')">
+                        <i class="fas fa-receipt"></i>
+                        <h3>Upload Receipt</h3>
+                        <p>Upload bank transfer receipt</p>
+                    </div>
+                </div>
+
+                <div class="payment-form">
+                    <!-- Card Payment Form -->
+                    <div id="card-payment" class="form-section">
+                        <h3>Card Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Card Number</label>
+                            <input type="text" class="form-control" placeholder="1234 5678 9012 3456" data-stripe="number">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Expiry Date</label>
+                                    <input type="text" class="form-control" placeholder="MM/YY" data-stripe="exp">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">CVV</label>
+                                    <input type="text" class="form-control" placeholder="123" data-stripe="cvc">
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="processPayment('card')">
+                            <i class="fas fa-lock me-2"></i> Pay Now
+                        </button>
+                    </div>
+
+                    <!-- Receipt Upload Form -->
+                    <div id="receipt-upload" class="form-section">
+                        <h3>Upload Bank Transfer Receipt</h3>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Please upload a clear copy of your bank transfer receipt showing the transaction details.
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Receipt (PDF or Image)</label>
+                            <div class="file-upload">
+                                <input type="file" id="receiptFile" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                                <label for="receiptFile" class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt me-2"></i>
+                                    <span>Choose file or drag & drop</span>
+                                </label>
+                                <div id="file-name" class="mt-2 text-muted">No file selected</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount Paid (₦)</label>
+                            <input type="number" id="receiptAmount" class="form-control" placeholder="Enter amount" min="1" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Transaction Date</label>
+                            <input type="date" id="transactionDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bank Name</label>
+                            <input type="text" id="bankName" class="form-control" placeholder="e.g., GTBank, First Bank" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Transaction Reference</label>
+                            <input type="text" id="transactionRef" class="form-control" placeholder="Enter transaction reference" required>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-block" onclick="submitReceipt()">
+                            <i class="fas fa-upload me-2"></i> Submit Receipt
+                        </button>
+                    </div>
+
+                    <!-- Bank Transfer Form -->
+                    <div id="bank-transfer" class="form-section">
+                        <div class="payment-method-details">
+                            <h4>Bank Transfer Details</h4>
+                            <p>Please transfer the payment to the following account:</p>
+                            <div class="bank-details">
+                                <p><strong>Bank Name:</strong> Access Bank</p>
+                                <p><strong>Account Name:</strong> WaterBill NG</p>
+                                <p><strong>Account Number:</strong> 0123456789</p>
+                                <p class="text-muted">Use your account number as the reference</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="processPayment('bank')">
+                            <i class="fas fa-check-circle me-2"></i> I've Made the Transfer
+                        </button>
+                    </div>
+
+                    <!-- Wallet Payment -->
+                    <div id="wallet-payment" class="form-section">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Your current wallet balance is: <strong>₦5,000.00</strong>
+                        </div>
+                        <button class="btn btn-primary" onclick="processPayment('wallet')">
+                            <i class="fas fa-wallet me-2"></i> Pay with Wallet
+                        </button>
+                    </div>
+                </div>
+
+                <div class="payment-summary">
+                    <h4>Order Summary</h4>
+                    <div class="summary-item">
+                        <span class="summary-label">Subscription Plan</span>
+                        <span class="summary-value">Monthly Premium</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Billing Cycle</span>
+                        <span class="summary-value">Monthly</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Amount</span>
+                        <span class="summary-value">₦5,000.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">VAT (7.5%)</span>
+                        <span class="summary-value">₦375.00</span>
+                    </div>
+                    <div class="summary-item summary-total">
+                        <span>Total Amount</span>
+                        <span>₦5,375.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <h3>Current Subscription</h3>
+            <p>Status: <span id="subscription-status">Loading...</span></p>
+            <p>Ends: <span id="subscription-end">Loading...</span></p>
+            <p>Minimum Payment: ₦<span id="min-payment">Loading...</span></p>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <h3>Choose Payment Duration</h3>
+        <div class="payment-options-row" id="payment-options">
+            <!-- Payment options will be loaded here -->
+        </div>
+
+        <div class="payment-form">
+            <form id="payment-form">
+                <div class="form-group">
+                    <label for="amount">Amount (₦)</label>
+                    <input type="number" id="amount" name="amount" required readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="method">Payment Method</label>
+                    <select id="method" name="method" required onchange="togglePaymentFields()">
+                        <option value="">Select Payment Method</option>
+                        <option value="paystack">Pay Online (Paystack)</option>
+                        <option value="bank_transfer">Bank Transfer (Manual Verification)</option>
+                        <option value="manual_upload">Upload Payment Receipt</option>
+                        <option value="cash">Cash Payment (Office Only)</option>
+                    </select>
+                </div>
+
+                <!-- Bank Transfer Details -->
+                <div id="bank-details" class="payment-method-details" style="display: none;">
+                    <div class="form-group">
+                        <h4>Bank Transfer Instructions</h4>
+                        <p>Please transfer to the following account:</p>
+                        <p><strong>Bank:</strong> Your Bank Name</p>
+                        <p><strong>Account Name:</strong> WaterBill NG</p>
+                        <p><strong>Account Number:</strong> 0123456789</p>
+                        <p><strong>Reference:</strong> <span id="payment-reference">WB-</span></p>
+                        <p class="text-muted">Please include the reference number in your transfer details.</p>
+                    </div>
+                </div>
+
+                <!-- Manual Upload Section -->
+                <div id="manual-upload" class="payment-method-details" style="display: none;">
+                    <div class="form-group">
+                        <label for="receipt">Upload Payment Receipt (PDF/Image)</label>
+                        <input type="file" id="receipt" name="receipt" accept=".pdf,.jpg,.jpeg,.png" class="form-control">
+                        <small class="form-text text-muted">Please upload a clear copy of your payment receipt (Max 5MB)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="transaction-id">Transaction/Reference Number</label>
+                        <input type="text" id="transaction-id" name="transaction_id" class="form-control" placeholder="Enter transaction reference">
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-date">Payment Date</label>
+                        <input type="date" id="payment-date" name="payment_date" class="form-control" max="">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" id="payment-btn">Make Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let minPayment = 2000;
+        let selectedAmount = 0;
+        
+        // Handle file selection
+        document.getElementById('receiptFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file selected';
+            document.getElementById('file-name').textContent = fileName;
+        });
+        
+        // Handle drag and drop
+        const fileUpload = document.querySelector('.file-upload');
+        const fileInput = document.getElementById('receiptFile');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, unhighlight, false);
+        });
+        
+        fileUpload.addEventListener('drop', handleDrop, false);
+        
+        function highlight() {
+            fileUpload.classList.add('highlight');
+        }
+        
+        function unhighlight() {
+            fileUpload.classList.remove('highlight');
+        }
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            document.getElementById('file-name').textContent = files[0].name;
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (window.AuthGuard) {
+                const session = await AuthGuard.requireUser();
+                if (!session) return; // redirected
+            } else {
+                await checkAuth();
+            }
+            loadPaymentData();
+            setupForm();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('../../api/auth/check-session.php', { credentials: 'include' });
+                const result = await response.json();
+                
+                const role = (result.role || '').toLowerCase();
+                if (!result.authenticated || role === 'admin') {
+                    window.location.href = '../auth/login.html';
+                }
+            } catch (error) {
+                window.location.href = '../auth/login.html';
+            }
+        }
+
+        // Load payment data from API
+        async function loadPaymentData() {
+            try {
+                // In a real app, fetch from your API
+                // const response = await fetch('/api/user/payment-data');
+                // const data = await response.json();
+                
+                // Mock data for demo
+                const mockData = {
+                    balance: 5000,
+                    subscription: {
+                        plan: 'Monthly Premium',
+                        amount: 5000,
+                        vat: 0.075,
+                        nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
+                    },
+                    paymentMethods: [
+                        { id: 'card', name: 'Credit/Debit Card', icon: 'fa-credit-card' },
+                        { id: 'bank', name: 'Bank Transfer', icon: 'fa-university' },
+                        { id: 'wallet', name: 'Wallet Balance', icon: 'fa-wallet' }
+                    ]
+                };
+                
+                // Update UI with loaded data
+                updatePaymentSummary(mockData);
+                
+            } catch (error) {
+                console.error('Error loading payment data:', error);
+                showAlert('Failed to load payment information. Please try again.', 'error');
+            }
+        }
+        
+        // Update payment summary section
+        function updatePaymentSummary(data) {
+            if (!data || !data.subscription) return;
+            
+            // Update subscription details
+            const statusElement = document.getElementById('subscription-status');
+            const endDateElement = document.getElementById('subscription-end');
+            
+            if (statusElement) {
+                statusElement.textContent = 'Active';
+            }
+            
+            if (endDateElement) {
+                endDateElement.textContent = data.subscription.nextBillingDate || 'N/A';
+            }
+            
+            // Update wallet balance if available
+            if (data.balance !== undefined) {
+                const walletBalance = document.querySelector('#wallet-payment strong');
+                if (walletBalance) {
+                    walletBalance.textContent = `₦${data.balance.toLocaleString()}.00`;
+                }
+            }
+        }
+        
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alert-container');
+            if (!container) return;
+            
+            const alertTypes = {
+                success: 'alert-success',
+                error: 'alert-danger',
+                warning: 'alert-warning',
+                info: 'alert-info'
+            };
+            
+            const alertClass = alertTypes[type] || 'alert-info';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert ${alertClass} alert-dismissible fade show`;
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            container.appendChild(alertDiv);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 150);
+            }, 5000);
+        }
+    </script>
+    <script src="../assets/js/notify.js"></script>
+    <script src="../assets/js/auth-guard.js"></script>
+    <!-- Mobile footer intentionally removed from this page -->
+
+    <style>
+        .main-footer {
+            background: linear-gradient(135deg, #1a2746, #2e6fff);
+            color: white;
+            margin-top: 60px;
+            padding: 40px 0 20px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .footer-section h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #e0e7ff;
+        }
+
+        .footer-section p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-section ul li a {
+            color: #e0e7ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: #ffffff;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 30px;
+            padding-top: 20px;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                text-align: center;
+            }
+        }
+    </style>
+</body>
+</html>
