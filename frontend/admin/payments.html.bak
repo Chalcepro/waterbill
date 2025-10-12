@@ -110,10 +110,8 @@
     </style>
 </head>
 <body>
-    <!-- Responsive Admin Header -->
-    <div id="admin-header">
-        <!-- Header will be loaded here -->
-    </div>
+    <!-- Standard Admin Header -->
+    <div id="admin-header"></div>
 
     <!-- Main Content -->
     <div class="container-fluid mt-4">
@@ -881,34 +879,13 @@
             loadPayments({ status, method, dateFrom, dateTo });
         }
 
-    <script>
-    // Load responsive admin header
-    document.addEventListener('DOMContentLoaded', function() {
-        // Load header
-        fetch('/waterbill/frontend/includes/admin-header-responsive.html')
+        // Load standard admin header
+        fetch('includes/standard-admin-header.html')
             .then(response => response.text())
             .then(html => {
-                const header = document.getElementById('admin-header');
-                if (header) {
-                    header.innerHTML = html;
-                    
-                    // Highlight current menu item
-                    const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
-                    document.querySelectorAll('.nav-link').forEach(link => {
-                        const href = link.getAttribute('href');
-                        if (href === currentPage || 
-                            (currentPage.includes(href.replace('.html', '')) && href !== '#')) {
-                            link.classList.add('active');
-                        }
-                    });
-                }
+                document.getElementById('admin-header').innerHTML = html;
             })
             .catch(error => console.error('Error loading header:', error));
-            
-        // Initialize payment management functionality
-        setupEventListeners();
-        loadPayments();
-    });
     </script>
-    </body>
+</body>
 </html>

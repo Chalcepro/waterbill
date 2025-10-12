@@ -4,9 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fault Reports - WaterBill NG Admin</title>
-    <link rel="stylesheet" href="../../assets/css/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery (required for Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         .reports-container {
             max-width: 1200px;
@@ -48,6 +54,43 @@
             padding: 20px;
         }
         
+        #photoModal .modal-dialog {
+            max-width: 90%;
+            max-height: 90vh;
+            margin: 1.75rem auto;
+        }
+        
+        #photoModal .modal-content {
+            background: transparent;
+            border: none;
+        }
+        
+        #photoModal .modal-body {
+            padding: 0;
+            text-align: center;
+        }
+        
+        #modal-photo {
+            max-width: 100%;
+            max-height: 80vh;
+            width: auto;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .cursor-zoom-in {
+            cursor: zoom-in;
+        }
+        
+        .report-photo {
+            transition: transform 0.2s;
+        }
+        
+        .report-photo:hover {
+            transform: scale(1.05);
+        }
+        
         .report-photo {
             max-width: 100%;
             max-height: 300px;
@@ -84,10 +127,14 @@
     </style>
 </head>
 <body>
-    <!-- Include admin header -->
-    <div id="admin-header"></div>
+    <!-- Responsive Admin Header -->
     
-    <div class="reports-container">
+    <!-- Responsive Admin Header -->
+    <div id="admin-header">
+        <!-- Header will be loaded here -->
+    </div>
+    
+    <div class="reports-container" style="margin-top: 80px;">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Fault Reports</h2>
             <div class="d-flex gap-2">
@@ -182,421 +229,31 @@
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Load responsive admin header -->
     <script>
-        let currentPage = 1;
-        let totalPages = 1;
-        
-        $(document).ready(function() {
-            // Load admin header
-            $('#admin-header').load('../includes/admin-header.html', function() {
-                // Highlight the current menu item
-                $('#menu-reports').addClass('active');
-            });
-            
-            // Load initial reports
-            loadReports();
-            
-            // Handle search on Enter key
-            $('#search-input').on('keyup', function(e) {
-                if (e.key === 'Enter') {
-                    loadReports();
-                }
-            });
-        });
-        
-        function loadReports(page = 1) {
-            currentPage = page;
-            const status = $('#status-filter').val();
-            const search = $('#search-input').val();
-            
-            // Show loading state
-            $('#reports-list').html(`
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2">Loading reports...</p>
-                </div>
-            `);
-            
-            // Build query string
-            let query = `?page=${page}`;
-            if (status) query += `&status=${status}`;
-            if (search) query += `&search=${encodeURIComponent(search)}`;
-            
-            // Fetch reports
-            fetch(`../../api/admin/fault-reports.php${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.success) {
-                        throw new Error(data.message || 'Failed to load reports');
-                    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load responsive admin header
+        fetch('/waterbill/frontend/includes/admin-header-responsive.html')
+            .then(response => response.text())
+            .then(html => {
+                const header = document.getElementById('admin-header');
+                if (header) {
+                    header.innerHTML = html;
                     
-                    totalPages = data.pagination?.last_page || 1;
-                    renderReports(data.data);
-                    renderPagination();
-                })
-                .catch(error => {
-                    console.error('Error loading reports:', error);
-                    $('#reports-list').html(`
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-circle"></i> 
-                            Failed to load reports. Please try again.
-                            <div class="small text-muted mt-1">${error.message}</div>
-                        </div>
-                    `);
-                });
-        }
-        
-        function renderReports(reports) {
-            if (!reports || reports.length === 0) {
-                $('#reports-list').html(`
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> No reports found matching your criteria.
-                    </div>
-                `);
-                return;
-            }
-            
-            let html = '';
-            
-            reports.forEach(report => {
-                const statusClass = `status-${report.status.replace(' ', '_')}`;
-                const formattedDate = new Date(report.created_at).toLocaleString();
-                const hasPhoto = report.photo_path && report.photo_path !== 'null';
-                
-                html += `
-                    <div class="report-card mb-3">
-                        <div class="report-header">
-                            <div>
-                                <strong>Report #${report.id}</strong>
-                                <span class="ms-2 status-badge ${statusClass}">
-                                    ${formatStatus(report.status)}
-                                </span>
-                            </div>
-                            <div class="text-muted small">${formattedDate}</div>
-                        </div>
-                        <div class="report-body">
-                            <div class="user-info mb-3">
-                                <div><strong>User:</strong> ${report.user_name || 'N/A'} (${report.account_number})</div>
-                                <div class="small text-muted">${report.email || ''}</div>
-                            </div>
-                            
-                            <h5>${report.category}</h5>
-                            <p class="mb-3">${report.description}</p>
-                            
-                            ${hasPhoto ? `
-                                <div>
-                                    <strong>Photo:</strong><br>
-                                    <img src="../../${report.photo_path}" 
-                                         class="report-photo img-thumbnail" 
-                                         onclick="showPhoto('../../${report.photo_path}')"
-                                         alt="Report photo">
-                                </div>
-                            ` : ''}
-                            
-                            <div class="admin-notes">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0"><strong>Admin Notes</strong></label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="edit-notes-toggle" onchange="toggleNotesEdit()">
-                                        <label class="form-check-label small" for="edit-notes-toggle">Edit</label>
-                                    </div>
-                                </div>
-                                <div id="notes-view" class="mb-2">
-                                    ${report.admin_notes || '<span class="text-muted">No notes added</span>'}
-                                </div>
-                                <div id="notes-edit" style="display: none;">
-                                    <textarea class="form-control mb-2" id="admin-notes-text" rows="3">${report.admin_notes || ''}</textarea>
-                                    <button class="btn btn-sm btn-primary" onclick="saveAdminNotes(${report.id})">Save</button>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="cancelEditNotes()">Cancel</button>
-                                </div>
-                            </div>
-                            
-                            <div class="report-actions">
-                                <button class="btn btn-sm btn-outline-primary" onclick="viewReportDetails(${report.id})">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
-                                
-                                ${report.status === 'open' ? `
-                                    <button class="btn btn-sm btn-warning" onclick="updateStatus(${report.id}, 'in_progress')">
-                                        <i class="fas fa-spinner"></i> Mark as In Progress
-                                    </button>
-                                ` : ''}
-                                
-                                ${report.status === 'in_progress' ? `
-                                    <button class="btn btn-sm btn-success" onclick="updateStatus(${report.id}, 'resolved')">
-                                        <i class="fas fa-check"></i> Mark as Resolved
-                                    </button>
-                                ` : ''}
-                                
-                                ${report.status !== 'rejected' ? `
-                                    <button class="btn btn-sm btn-danger" onclick="updateStatus(${report.id}, 'rejected')">
-                                        <i class="fas fa-times"></i> Reject
-                                    </button>
-                                ` : ''}
-                                
-                                ${report.status === 'rejected' ? `
-                                    <button class="btn btn-sm btn-success" onclick="updateStatus(${report.id}, 'open')">
-                                        <i class="fas fa-undo"></i> Reopen
-                                    </button>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            $('#reports-list').html(html);
-        }
-        
-        function renderPagination() {
-            let pagination = $('#pagination');
-            pagination.empty();
-            
-            if (totalPages <= 1) return;
-            
-            // Previous button
-            pagination.append(`
-                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                    <a class="page-link" href="#" onclick="loadReports(${currentPage - 1}); return false;">
-                        <i class="fas fa-chevron-left"></i>
-                    </a>
-                </li>
-            `);
-            
-            // Page numbers
-            const maxPages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
-            let endPage = Math.min(totalPages, startPage + maxPages - 1);
-            
-            if (endPage - startPage + 1 < maxPages) {
-                startPage = Math.max(1, endPage - maxPages + 1);
-            }
-            
-            if (startPage > 1) {
-                pagination.append(`
-                    <li class="page-item">
-                        <a class="page-link" href="#" onclick="loadReports(1); return false;">1</a>
-                    </li>
-                `);
-                if (startPage > 2) {
-                    pagination.append('<li class="page-item disabled"><span class="page-link">...</span></li>');
-                }
-            }
-            
-            for (let i = startPage; i <= endPage; i++) {
-                pagination.append(`
-                    <li class="page-item ${i === currentPage ? 'active' : ''}">
-                        <a class="page-link" href="#" onclick="loadReports(${i}); return false;">${i}</a>
-                    </li>
-                `);
-            }
-            
-            if (endPage < totalPages) {
-                if (endPage < totalPages - 1) {
-                    pagination.append('<li class="page-item disabled"><span class="page-link">...</span></li>');
-                }
-                pagination.append(`
-                    <li class="page-item">
-                        <a class="page-link" href="#" onclick="loadReports(${totalPages}); return false;">${totalPages}</a>
-                    </li>
-                `);
-            }
-            
-            // Next button
-            pagination.append(`
-                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                    <a class="page-link" href="#" onclick="loadReports(${currentPage + 1}); return false;">
-                        <i class="fas fa-chevron-right"></i>
-                    </a>
-                </li>
-            `);
-        }
-        
-        function updateStatus(reportId, status) {
-            if (!confirm(`Are you sure you want to mark this report as ${formatStatus(status)}?`)) {
-                return;
-            }
-            
-            fetch(`../../api/admin/fault-reports.php`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: reportId,
-                    status: status,
-                    notes: $(`#admin-notes-text`).val() || ''
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('success', `Report marked as ${formatStatus(status)}`);
-                    loadReports(currentPage);
-                } else {
-                    throw new Error(data.message || 'Failed to update status');
+                    // Highlight current menu item
+                    const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (href === currentPage || 
+                            (currentPage.includes(href.replace('.html', '')) && href !== '#')) {
+                            link.classList.add('active');
+                        }
+                    });
                 }
             })
-            .catch(error => {
-                console.error('Error updating status:', error);
-                showAlert('danger', error.message || 'Failed to update status');
-            });
-        }
-        
-        function saveAdminNotes(reportId) {
-            const notes = $(`#admin-notes-text`).val();
-            
-            fetch(`../../api/admin/fault-reports.php`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: reportId,
-                    notes: notes
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('success', 'Notes saved successfully');
-                    $(`#notes-view`).html(notes || '<span class="text-muted">No notes added</span>');
-                    cancelEditNotes();
-                    loadReports(currentPage);
-                } else {
-                    throw new Error(data.message || 'Failed to save notes');
-                }
-            })
-            .catch(error => {
-                console.error('Error saving notes:', error);
-                showAlert('danger', error.message || 'Failed to save notes');
-            });
-        }
-        
-        function toggleNotesEdit() {
-            $('#notes-view').toggle();
-            $('#notes-edit').toggle();
-        }
-        
-        function cancelEditNotes() {
-            $('#edit-notes-toggle').prop('checked', false);
-            $('#notes-view').show();
-            $('#notes-edit').hide();
-        }
-        
-        function viewReportDetails(reportId) {
-            // You can implement a detailed view in a modal if needed
-            const modal = new bootstrap.Modal(document.getElementById('reportModal'));
-            
-            // For now, just show a simple message
-            $('#report-details').html(`
-                <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            `);
-            
-            // In a real implementation, you would fetch the full report details here
-            fetch(`../../api/admin/fault-reports.php?id=${reportId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.data) {
-                        const report = data.data;
-                        $('#report-details').html(`
-                            <h5>${report.category}</h5>
-                            <p>${report.description}</p>
-                            ${report.photo_path ? `
-                                <div class="mb-3">
-                                    <img src="../../${report.photo_path}" class="img-fluid rounded" alt="Report photo">
-                                </div>
-                            ` : ''}
-                            <div class="mb-3">
-                                <strong>Status:</strong> 
-                                <span class="badge bg-${getStatusBadgeClass(report.status)}">
-                                    ${formatStatus(report.status)}
-                                </span>
-                            </div>
-                            <div class="mb-3">
-                                <strong>Reported By:</strong> ${report.user_name || 'N/A'} (${report.account_number || 'N/A'})
-                            </div>
-                            <div class="mb-3">
-                                <strong>Reported On:</strong> ${new Date(report.created_at).toLocaleString()}
-                            </div>
-                            ${report.admin_notes ? `
-                                <div class="card mt-3">
-                                    <div class="card-header">
-                                        <strong>Admin Notes</strong>
-                                    </div>
-                                    <div class="card-body">
-                                        ${report.admin_notes}
-                                    </div>
-                                </div>
-                            ` : ''}
-                        `);
-                    } else {
-                        throw new Error(data.message || 'Failed to load report details');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading report details:', error);
-                    $('#report-details').html(`
-                        <div class="alert alert-danger">
-                            Failed to load report details: ${error.message}
-                        </div>
-                    `);
-                });
-            
-            modal.show();
-        }
-        
-        function showPhoto(photoUrl) {
-            $('#modal-photo').attr('src', photoUrl);
-            const modal = new bootstrap.Modal(document.getElementById('photoModal'));
-            modal.show();
-        }
-        
-        function resetFilters() {
-            $('#status-filter').val('');
-            $('#search-input').val('');
-            loadReports(1);
-        }
-        
-        function formatStatus(status) {
-            return status
-                .split('_')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-        }
-        
-        function getStatusBadgeClass(status) {
-            switch(status) {
-                case 'open': return 'warning';
-                case 'in_progress': return 'info';
-                case 'resolved': return 'success';
-                case 'rejected': return 'danger';
-                default: return 'secondary';
-            }
-        }
-        
-        function showAlert(type, message) {
-            const alert = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            `;
-            
-            // Remove any existing alerts
-            $('.alert-dismissible').remove();
-            
-            // Add the new alert and auto-remove after 5 seconds
-            $(alert).insertAfter('.reports-container > h2')
-                   .delay(5000)
-                   .fadeOut(400, function() { $(this).remove(); });
-        }
+            .catch(error => console.error('Error loading header:', error));
+    });
     </script>
 </body>
 </html>

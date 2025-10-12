@@ -195,11 +195,7 @@
 </head>
 <body>
     <!-- Standard Admin Header -->
-    
-    <!-- Responsive Admin Header -->
-    <div id="admin-header">
-        <!-- Header will be loaded here -->
-    </div>
+    <div id="admin-header"></div>
 
     <div class="admin-dashboard">
         <div class="dashboard-header">
@@ -464,31 +460,5 @@
             })
             .catch(error => console.error('Error loading header:', error));
     </script>
-
-    <!-- Load responsive admin header -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Load responsive admin header
-        fetch('/waterbill/frontend/includes/admin-header-responsive.html')
-            .then(response => response.text())
-            .then(html => {
-                const header = document.getElementById('admin-header');
-                if (header) {
-                    header.innerHTML = html;
-                    
-                    // Highlight current menu item
-                    const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
-                    document.querySelectorAll('.nav-link').forEach(link => {
-                        const href = link.getAttribute('href');
-                        if (href === currentPage || 
-                            (currentPage.includes(href.replace('.html', '')) && href !== '#')) {
-                            link.classList.add('active');
-                        }
-                    });
-                }
-            })
-            .catch(error => console.error('Error loading header:', error));
-    });
-    </script>
-    </body>
+</body>
 </html>
