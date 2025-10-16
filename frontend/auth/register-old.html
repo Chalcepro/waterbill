@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - WaterBill NG</title>
+    <link rel="stylesheet" href="../assets/css/auth.css">
+    <!-- Bootstrap 5 CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-bg-waves"></div>
+    <div class="auth-container" style="background: transparent; box-shadow: none;">
+        <img src="../assets/images/logo.png" alt="WaterBill NG Logo" class="logo" onerror="this.style.display='none'">
+        <h2 style="color:#fff; text-shadow:0 2px 10px rgba(0,0,0,0.2)">Create Account</h2>
+        <div id="error-message" class="error" style="display: none;"></div>
+        <div id="success-message" class="success" style="display: none;"></div>
+        <form id="register-form" autocomplete="on" class="w-100" style="max-width:460px">
+            <div class="form-group">
+                <label for="username" class="text-white-50">Username</label>
+                <input class="form-control form-control-lg auth-input" type="text" name="username" id="username" placeholder="Choose a unique username" required>
+            </div>
+
+            <!-- Step 1 -->
+            <div id="step1">
+                <div class="form-group">
+                    <label for="email" class="text-white-50">Email</label>
+                    <input class="form-control form-control-lg auth-input" type="email" name="email" id="email" placeholder="test@gmail.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone" class="text-white-50">Phone</label>
+                    <input class="form-control form-control-lg auth-input" type="tel" name="phone" id="phone" placeholder="11-digit phone" inputmode="numeric" pattern="\\d{11}" maxlength="11" required>
+                </div>
+                <div class="form-group">
+                    <label for="first_name" class="text-white-50">First Name</label>
+                    <input class="form-control form-control-lg auth-input" type="text" name="first_name" id="first_name" placeholder="First Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="middle_name" class="text-white-50">Middle Name <span class="text-white-50 small">(Optional)</span></label>
+                    <input class="form-control form-control-lg auth-input" type="text" name="middle_name" id="middle_name" placeholder="Middle Name">
+                </div>
+                <div class="form-group">
+                    <label for="surname" class="text-white-50">Surname</label>
+                    <input class="form-control form-control-lg auth-input" type="text" name="surname" id="surname" placeholder="Surname" required>
+                </div>
+                <button type="button" id="nextBtn" class="btn btn-teal btn-lg w-100 shadow-sm">Next</button>
+                <div class="d-flex justify-content-center mt-2 mb-2">
+                    <span class="small text-white-50">Already have an account? <a class="link-light link-opacity-75-hover" href="login.html">Login</a></span>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div id="step2" style="display:none">
+                <div class="form-group">
+                    <label for="flat_no" class="text-white-50">Flat No.</label>
+                    <input class="form-control form-control-lg auth-input" type="text" name="flat_no" id="flat_no" placeholder="No. 5" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="text-white-50">Password</label>
+                    <div class="position-relative">
+                        <input class="form-control form-control-lg auth-input pe-5" type="password" name="password" id="password" placeholder="12345ABCDE..." required>
+                        <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-2" id="togglePwd" style="border:none;background:transparent;color:#0b3650">Show</button>
+                    </div>
+                    <div class="mt-1 small" id="pwdStrength" style="color:#e6f7ff">
+                        <div class="progress" style="height:6px;background:rgba(255,255,255,.35);">
+                            <div class="progress-bar" id="pwdBar" role="progressbar" style="width: 0%; background:#ef4444"></div>
+                        </div>
+                        <span id="pwdLabel">Weak</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password" class="text-white-50">Confirm Password</label>
+                    <div class="position-relative">
+                        <input class="form-control form-control-lg auth-input pe-5" type="password" name="confirm_password" id="confirm_password" placeholder="12345ABCDE..." required>
+                        <button type="button" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-2" id="toggleConfirm" style="border:none;background:transparent;color:#0b3650">Show</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="role" class="text-white-50">Role</label>
+                    <select class="form-select form-select-lg auth-input" name="role" id="role" required>
+                        <option value="">Select Role</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-1 mb-2">
+                    <span class="small text-white-50">Already have an account? <a class="link-light link-opacity-75-hover" href="login.html">Login</a></span>
+                </div>
+                <button type="submit" id="register-btn" class="btn btn-teal btn-lg w-100 shadow-sm">Register</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Form submission handler
+        const registerForm = document.getElementById('register-form');
+        if (registerForm) {
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const registerBtn = document.getElementById('register-btn');
+                const errorDiv = document.getElementById('error-message');
+                const successDiv = document.getElementById('success-message');
+                
+                if (!registerBtn || !errorDiv || !successDiv) {
+                    console.error('Required elements not found');
+                    return;
+                }
+                
+                registerBtn.disabled = true;
+                registerBtn.textContent = 'Registering...';
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+            
+            const formData = new FormData(this);
+            // client-side confirm check
+            const pwd = document.getElementById('password');
+            const cpwd = document.getElementById('confirm_password');
+            if (pwd && cpwd && pwd.value !== cpwd.value) {
+                const msg = 'Passwords do not match';
+                errorDiv.textContent = msg;
+                errorDiv.style.display = 'block';
+                if (window.notify) notify.warn(msg);
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
+            }
+            
+            try {
+                const response = await fetch('../../api/auth/register.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json().catch(err => {
+                    console.error('Error parsing JSON:', err);
+                    throw new Error('Invalid response from server');
+                });
+                
+                if (result.success) {
+                    const msg = result.message || 'Registration successful! Redirecting to login...';
+                    successDiv.textContent = msg;
+                    successDiv.style.display = 'block';
+                    if (window.notify) notify.success(msg);
+                    // Redirect to login after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    const msg = Array.isArray(result.errors) 
+                        ? result.errors.join('\n') 
+                        : (result.message || 'Registration failed. Please try again.');
+                    errorDiv.innerHTML = msg.replace(/\n/g,'<br>');
+                    errorDiv.style.display = 'block';
+                    if (window.notify) notify.error(msg);
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                const errorMessage = error.message || 'Connection error. Please try again.';
+                errorDiv.textContent = errorMessage;
+                errorDiv.style.display = 'block';
+                if (window.notify) notify.error(errorMessage);
+            }
+            
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+            });
+        }
+    </script>
+    <!-- Footer -->
+    <footer class="auth-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 WaterBill NG. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(180deg, #11c0d4 0%, #08a9d4 40%, #04a0c9 60%, #039ed1 100%);
+            overflow-x: hidden;
+            /* Safe area so footer doesn't cover CTA buttons */
+            padding-bottom: 140px;
+        }
+        .auth-bg-waves{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+        .auth-container{ position:relative; z-index:1; }
+        .auth-bg-waves::before, .auth-bg-waves::after {
+            content: '';
+            position: absolute;
+            left: -10%;
+            right: -10%;
+            height: 40vh;
+            border-bottom-left-radius: 50% 40%;
+            border-bottom-right-radius: 50% 40%;
+            background: radial-gradient(60% 80% at 50% 20%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 60%, rgba(255,255,255,0.08) 100%);
+            top: -22vh;
+            filter: blur(0.3px);
+        }
+        .auth-bg-waves::after{
+            top: auto;
+            bottom: -22vh;
+            border-top-left-radius: 50% 40%;
+            border-top-right-radius: 50% 40%;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .auth-input {
+            border-radius: 999px;
+            padding-left: 16px;
+            padding-right: 16px;
+            border: none;
+            background: rgba(255,255,255,0.9);
+        }
+        .auth-input:focus { box-shadow: 0 0 0 .2rem rgba(3, 158, 209, .25); }
+        .btn-teal { background:#0d6e7a; border-radius:999px; border:none; }
+        .btn-teal:hover { background:#0a5962; }
+        .auth-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 39, 70, 0.8);
+            color: white;
+            padding: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #e0e7ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .footer-links {
+                gap: 15px;
+            }
+        }
+        /* Extra bottom space inside form for mobile */
+        form#register-form{ padding-bottom: 24px; }
+        @media (max-width: 600px){
+            body{ padding-bottom: 180px; }
+        }
+    </style>
+    <script>
+        // Simple stepper
+        document.addEventListener('DOMContentLoaded', function() {
+            const nextBtn = document.getElementById('nextBtn');
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            
+            if (nextBtn && step1 && step2) {
+                nextBtn.addEventListener('click', function() {
+                    // Validate step 1 fields
+                    const email = document.getElementById('email');
+                    const phone = document.getElementById('phone');
+                    const firstName = document.getElementById('first_name');
+                    const surname = document.getElementById('surname');
+                    const phoneOk = /^\d{11}$/.test((phone.value || '').trim());
+                    
+                    if (!email.value || !phoneOk || !firstName.value || !surname.value) {
+                        const errorDiv = document.getElementById('error-message');
+                        errorDiv.textContent = 'Please complete all required fields: Email, 11-digit Phone, First Name, and Surname';
+                        errorDiv.style.display = 'block';
+                        if (window.notify) notify.warn('Please complete all required fields');
+                        return;
+                    }
+                    
+                    // Proceed to step 2
+                    step1.style.display = 'none';
+                    step2.style.display = 'block';
+                    
+                    // Scroll to top of form
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+                    return;
+                }
+                step1.style.display = 'none';
+                step2.style.display = '';
+                // Ensure the Register button is visible
+                const regBtn = document.getElementById('register-btn');
+                setTimeout(() => regBtn && regBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+            });
+        }
+        // On load, make sure Next button is in view on small screens
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => nextBtn && nextBtn.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100);
+            // Sanitize phone to digits-only and 11 max
+            const phone = document.getElementById('phone');
+            if (phone) {
+                phone.addEventListener('input', () => {
+                    phone.value = (phone.value || '').replace(/[^\d]/g, '').slice(0, 11);
+                });
+            }
+
+            // Password show/hide
+            const pwd = document.getElementById('password');
+            const cpwd = document.getElementById('confirm_password');
+            const togglePwd = document.getElementById('togglePwd');
+            const toggleConfirm = document.getElementById('toggleConfirm');
+            if (togglePwd) togglePwd.addEventListener('click', ()=>{
+                if (!pwd) return; const is = pwd.getAttribute('type') === 'password';
+                pwd.setAttribute('type', is ? 'text' : 'password');
+                togglePwd.textContent = is ? 'Hide' : 'Show';
+            });
+            if (toggleConfirm) toggleConfirm.addEventListener('click', ()=>{
+                if (!cpwd) return; const is = cpwd.getAttribute('type') === 'password';
+                cpwd.setAttribute('type', is ? 'text' : 'password');
+                toggleConfirm.textContent = is ? 'Hide' : 'Show';
+            });
+
+            // Password strength meter
+            const pwdBar = document.getElementById('pwdBar');
+            const pwdLabel = document.getElementById('pwdLabel');
+            const calcStrength = (val) => {
+                let score = 0; if (!val) return 0;
+                if (val.length >= 8) score += 1;
+                if (/[A-Z]/.test(val)) score += 1;
+                if (/[a-z]/.test(val)) score += 1;
+                if (/[0-9]/.test(val)) score += 1;
+                if (/[^A-Za-z0-9]/.test(val)) score += 1;
+                return score; // 0-5
+            };
+            const renderStrength = () => {
+                if (!pwdBar || !pwdLabel || !pwd) return;
+                const s = calcStrength(pwd.value);
+                const pct = [0,20,40,60,80,100][s];
+                const colors = ['#ef4444','#f97316','#f59e0b','#84cc16','#16a34a','#16a34a'];
+                const labels = ['Weak','Weak','Fair','Good','Strong','Strong'];
+                pwdBar.style.width = pct + '%';
+                pwdBar.style.background = colors[s];
+                pwdLabel.textContent = labels[s];
+            };
+            if (pwd) pwd.addEventListener('input', renderStrength);
+            renderStrength();
+        });
+    </script>
+    <script src="../assets/js/notify.js"></script>
+    <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -7,8 +7,20 @@
   <link rel="stylesheet" href="../assets/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
+    /* Ensure main content has enough padding at the bottom to prevent footer overlap */
+    .content {
+        min-height: calc(100vh - 100px);
+        padding-bottom: 100px;
+    }
+    
+    /* Adjust for mobile view */
+    @media (max-width: 768px) {
+        .content {
+            padding-bottom: 150px; /* Extra space for mobile bottom nav */
+        }
+    }
     body{font-family:'Inter',Arial,sans-serif;margin:0;padding:0;background:linear-gradient(180deg,#11c0d4 0%,#08a9d4 40%,#04a0c9 60%,#039ed1 100%);min-height:100vh}
-    .container{max-width:600px;margin:0 auto;padding:20px 16px 180px 16px}
+    .container{max-width:600px;margin:0 auto;padding:20px 16px 240px 16px}
     .card{background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,0.08);padding:18px 16px;margin-top:16px}
     .card h1{margin:0 0 6px 0;font-size:1.35rem;color:#1a2746}
     .card p.sub{margin:0 0 12px 0;color:#6b7280}
@@ -25,6 +37,7 @@
   </style>
 </head>
 <body>
+  <div class="content">
   <div class="container">
     <div id="alert"></div>
     <div class="card">
@@ -56,6 +69,7 @@
         </div>
       </form>
     </div>
+  </div>
   </div>
 
   <script>
@@ -98,6 +112,34 @@
   </script>
   <script src="../assets/js/notify.js"></script>
   <script src="../assets/js/auth-guard.js"></script>
-  <script src="../assets/js/mobile-footer.js"></script>
+  <script src="../assets/js/bottom-nav.js"></script>
+  <script src="../assets/js/include-footer.js"></script>
+  <script>
+    // Fix for logout functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle logout button click
+        const logoutBtn = document.querySelector('.nav-link[href="#"]');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                try {
+                    const response = await fetch('../../api/auth/logout.php', {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        localStorage.removeItem('userEmail');
+                        window.location.href = '../auth/login.html';
+                    } else {
+                        throw new Error('Failed to log out');
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    alert('Failed to log out. Please try again.');
+                }
+            });
+        }
+    });
+  </script>
 </body>
 </html>

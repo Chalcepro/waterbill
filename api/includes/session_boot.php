@@ -25,8 +25,18 @@ if (!function_exists('session_boot')) {
         // Apply cookie params (PHP >=7.3 supports array form)
         session_set_cookie_params($params);
 
+        // Ensure session is not already started to avoid conflicts
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
+        // Prevent session fixation by regenerating session ID
+        if (!isset($_SESSION['initiated'])) {
+            session_regenerate_id(true);
+            $_SESSION['initiated'] = true;
+        }
+
+        // Debugging log
+        error_log('Session initialized successfully.');
     }
 }

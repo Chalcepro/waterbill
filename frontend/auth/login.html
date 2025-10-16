@@ -25,7 +25,7 @@
             </div>
             <div class="d-flex justify-content-between align-items-center mt-1 mb-2">
                 <a href="forgot-password.html" class="link-light link-opacity-75-hover small">Forgot Password ?</a>
-                <span class="small text-white-50">Don't have an account? <a class="link-light link-opacity-75-hover" href="register.html">Register</a></span>
+                <span class="small text-white-50">Don't have an account? <a class="link-light link-opacity-75-hover" href="register-fixed.html">Register</a></span>
             </div>
             <button type="submit" id="login-btn" class="btn btn-teal btn-lg w-100 shadow-sm">Login</button>
         </form>
@@ -48,33 +48,52 @@
                 const response = await fetch('../../api/auth/login.php', {
                     method: 'POST',
                     body: formData,
-                    credentials: 'include'
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 });
                 
-                const result = await response.json();
+                // Check if response is OK before parsing JSON
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json().catch(err => {
+                    console.error('Error parsing JSON:', err);
+                    throw new Error('Invalid response from server');
+                });
+                
+                console.log('Login response:', result); // Debug log
                 
                 if (result.success) {
+                    // Show success message
+                    if (window.notify) {
+                        notify.success(result.message || 'Login successful!');
+                    }
+                    
                     // Redirect based on role
                     if (result.role === 'admin') {
-                        if (window.notify) notify.success('Welcome back, admin!');
                         window.location.href = '../admin/dashboard.html';
                     } else {
-                        if (window.notify) notify.success('Welcome back!');
                         window.location.href = '../user/dashboard.html';
                     }
                 } else {
-                    errorDiv.textContent = result.message || 'Login failed. Please try again.';
+                    const errorMessage = result.message || 'Login failed. Please check your credentials and try again.';
+                    errorDiv.textContent = errorMessage;
                     errorDiv.style.display = 'block';
-                    if (window.notify) notify.error(result.message || 'Login failed. Please try again.');
+                    if (window.notify) notify.error(errorMessage);
                 }
             } catch (error) {
-                errorDiv.textContent = 'Connection error. Please try again.';
+                console.error('Login error:', error);
+                const errorMessage = error.message || 'Connection error. Please check your internet connection and try again.';
+                errorDiv.textContent = errorMessage;
                 errorDiv.style.display = 'block';
-                if (window.notify) notify.error('Connection error. Please try again.');
+                if (window.notify) notify.error(errorMessage);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
             }
-            
-            loginBtn.disabled = false;
-            loginBtn.textContent = 'Login';
         });
     </script>
     <!-- Footer -->

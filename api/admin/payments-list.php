@@ -63,22 +63,29 @@ try {
     $stmt->execute($params);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $out = array_map(function($r){
+    $out = array_map(function($r) use ($hasP) {
         $name = trim(($r['first_name'] ?? '') . ' ' . ($r['middle_name'] ?? '') . ' ' . ($r['surname'] ?? ''));
         // Normalize status to UI terms
         $status = strtolower($r['status'] ?? 'pending');
         if ($status === 'approved') $status = 'completed';
+        
+        // Get payment method, default to 'manual_upload' if not specified
+        $method = strtolower($r['method'] ?? 'manual_upload');
+        
         return [
             'id' => (int)$r['id'],
+            'user_id' => (int)$r['user_id'],
             'user' => $name ?: 'User#'.$r['user_id'],
             'email' => $r['email'] ?? '',
-            'flat' => $r['flat_no'] ?? '',
+            'flat_no' => $r['flat_no'] ?? '',
             'amount' => (float)$r['amount'],
-            'method' => ucfirst($r['method'] ?? 'Unknown'),
-            'date' => date('Y-m-d', strtotime($r['created_at'] ?? 'now')),
-            'time' => date('H:i:s', strtotime($r['created_at'] ?? 'now')),
+            'method' => $method,  // Changed to match frontend expectation
+            'payment_method' => $method,  // Also include as payment_method for backward compatibility
             'status' => $status,
-            'reference' => $r['reference'] ?? ''
+            'reference' => $r['reference'] ?? '',
+            'created_at' => $r['created_at'] ?? date('Y-m-d H:i:s'),
+            'date' => date('Y-m-d', strtotime($r['created_at'] ?? 'now')),
+            'time' => date('H:i:s', strtotime($r['created_at'] ?? 'now'))
         ];
     }, $rows);
 

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Make Payment - WaterBill NG</title>
     <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/bottom-nav.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            /* Modern color palette */
             --primary-50: #f0f9ff;
             --primary-100: #e0f2fe;
             --primary-200: #bae6fd;
@@ -59,8 +59,6 @@
             --header-height: 4rem;
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
         * {
             margin: 0;
             padding: 0;
@@ -80,34 +78,12 @@
             -moz-osx-font-smoothing: grayscale;
         }
         
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
         h1, h2, h3, h4, h5, h6 {
             font-weight: 700;
-            color: var(--text-dark);
+            color: var(--gray-800);
             margin-bottom: 1rem;
         }
         
-        .btn {
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            transition: var(--transition);
-            letter-spacing: 0.3px;
-        }
-        
-        .btn-primary {
-            background: var(--gradient-primary);
-            border: none;
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
-            background: var(--primary-color);
-        }
-
         /* Layout */
         .container {
             width: 100%;
@@ -148,13 +124,13 @@
         }
 
         .page-header h1 {
-            color: var(--text-dark);
+            color: var(--gray-800);
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
         .page-header p {
-            color: var(--text-muted);
+            color: var(--gray-600);
             font-size: 1.1rem;
             max-width: 700px;
             margin: 0 auto;
@@ -191,6 +167,14 @@
             background-color: var(--gray-50);
         }
         
+        .payment-card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
         .payment-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
@@ -198,8 +182,8 @@
 
         .payment-card-header {
             padding: 1.75rem 2rem;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--gradient-primary);
+            border-bottom: 1px solid var(--gray-200);
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
             color: white;
         }
         
@@ -236,6 +220,7 @@
             cursor: pointer;
             transition: var(--transition);
             overflow: hidden;
+            text-align: center;
         }
         
         .payment-option::before {
@@ -285,75 +270,14 @@
             transform: scale(1.1);
         }
 
-        .payment-option {
-            border: 2px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 2rem 1.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            background: #fff;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-        
-        .payment-option::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary-color);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-            z-index: -1;
-        }
-        
-        .payment-option:hover::before {
-            transform: scaleX(1);
-        }
-
-        .payment-option:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(46, 111, 255, 0.1);
-        }
-
-        .payment-option.selected {
-            border-color: var(--primary-color);
-            background: var(--primary-light);
-        }
-
-        .payment-option i {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-bottom: 1.25rem;
-            display: inline-flex;
-            width: 70px;
-            height: 70px;
-            background: var(--primary-light);
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        
-        .payment-option:hover i {
-            background: var(--gradient-primary);
-            color: white;
-            transform: scale(1.1);
-        }
-
         .payment-option h3 {
             margin: 0 0 0.5rem;
-            color: var(--text-dark);
+            color: var(--gray-800);
             font-size: 1.25rem;
         }
 
         .payment-option p {
-            color: var(--text-muted);
+            color: var(--gray-600);
             margin: 0;
             font-size: 0.9rem;
         }
@@ -452,71 +376,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        .form-group {
-            margin-bottom: 1.75rem;
-            position: relative;
-        }
-        
-        .form-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-dark);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.875rem 1.25rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: var(--transition);
-            background-color: #f9fafc;
-            height: auto;
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(46, 111, 255, 0.25);
-            outline: none;
-        }
-        
-        .form-control::placeholder {
-            color: #a0aec0;
-            opacity: 1;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #1a56d6;
-            transform: translateY(-2px);
-        }
-
-        .btn-block {
-            display: block;
-            width: 100%;
-        }
-
         /* Summary Section */
         .payment-summary {
             background: white;
@@ -561,69 +420,12 @@
             color: var(--primary-700);
         }
         
-        .payment-summary h4 {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-dark);
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px dashed var(--border-color);
-            align-items: center;
-        }
-        
-        .summary-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-            padding-top: 0.5rem;
-        }
-
-        .summary-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .summary-label {
-            color: var(--text-muted);
-        }
-
-        .summary-value {
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .summary-total {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid var(--border-color);
-        }
-        
-        .summary-total .summary-value {
-            font-size: 1.4rem;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .payment-method-details {
-            background: #f9fafc;
+            background: var(--gray-50);
             border-radius: var(--border-radius);
             padding: 1.75rem;
             margin: 2rem 0;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--gray-200);
             position: relative;
             overflow: hidden;
         }
@@ -635,13 +437,13 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background: var(--gradient-primary);
+            background: var(--primary-500);
         }
 
         .payment-method-details h4 {
             margin-top: 0;
-            color: var(--text-dark);
-            border-bottom: 1px solid var(--border-color);
+            color: var(--gray-800);
+            border-bottom: 1px solid var(--gray-200);
             padding-bottom: 0.75rem;
             margin-bottom: 1rem;
         }
@@ -689,8 +491,35 @@
         }
 
         .text-muted {
-            color: var(--text-muted);
+            color: var(--gray-500);
             font-size: 0.9em;
+        }
+
+        /* File Upload Styles */
+        .file-upload {
+            border: 2px dashed var(--gray-300);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .file-upload:hover, .file-upload.highlight {
+            border-color: var(--primary-500);
+            background-color: var(--primary-50);
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 10px;
+            cursor: pointer;
+            color: var(--primary-500);
+            font-weight: 500;
+        }
+        
+        .file-input {
+            display: none;
         }
 
         /* Responsive Design */
@@ -733,140 +562,126 @@
         
         /* Animation for payment method selection */
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(14, 165, 233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
         }
         
         .payment-option.selected {
-            border-color: var(--primary-color);
-            background-color: #f8faff;
+            border-color: var(--primary-500);
+            background-color: var(--primary-50);
             animation: pulse 1s;
         }
-        
-        /* Custom checkbox style */
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
+
         /* Loading spinner */
-        .spinner-border {
+        .spinner {
+            display: inline-block;
             width: 1.25rem;
             height: 1.25rem;
-            border-width: 0.15em;
+            border: 0.15em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner 0.75s linear infinite;
             margin-right: 0.5rem;
         }
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
+        
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
         }
 
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e6ed;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            outline: none;
+        /* Ensure main content has enough padding at the bottom to prevent footer overlap */
+        .content {
+            min-height: calc(100vh - 400px);
+            padding-bottom: 100px;
+        }
+        
+        /* Adjust for mobile view */
+        @media (max-width: 768px) {
+            .content {
+                padding-bottom: 150px; /* Extra space for mobile bottom nav */
+            }
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: #2e6fff;
-            box-shadow: 0 0 0 2px rgba(46, 111, 255, 0.2);
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 0.75rem 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
-
-        .btn {
-            display: inline-flex;
+        
+        .nav-link {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            background: #2e6fff;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            width: 100%;
+            text-decoration: none;
+            color: var(--gray-600);
+            font-size: 0.75rem;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-600);
+            background: var(--primary-50);
+        }
+        
+        .nav-link i {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
         }
 
-        .btn:hover {
-            background: #1a2746;
-        }
-
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .alert.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .subscription-info {
-            background: #f8faff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border-left: 4px solid #2e6fff;
-        }
-
-        /* File Upload Styles */
-        .file-upload {
-            border: 2px dashed #d1d5db;
-            border-radius: 8px;
-            padding: 20px;
+        /* Payment Status */
+        .payment-status {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
             text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
         }
         
-        .file-upload:hover, .file-upload.highlight {
-            border-color: #2e6fff;
-            background-color: #f0f7ff;
+        .payment-status.success {
+            background-color: var(--secondary-100);
+            color: var(--secondary-600);
+            border: 1px solid var(--secondary-400);
         }
         
-        .file-upload-label {
-            display: block;
-            padding: 10px;
-            cursor: pointer;
-            color: #2e6fff;
-            font-weight: 500;
+        .payment-status.error {
+            background-color: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fca5a5;
+        }
+
+        /* Card Input Styling */
+        .card-input-group {
+            display: flex;
+            gap: 1rem;
         }
         
-        .file-input {
-            display: none;
+        .card-input-group .form-group {
+            flex: 1;
+        }
+        
+        /* Auto-fill styling */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px white inset;
+            transition: background-color 5000s ease-in-out 0s;
         }
     </style>
 </head>
 <body>
     <div class="payment-container">
-        <header class="page-header">
-            <h1>Make a Payment</h1>
-            <p>Choose your preferred payment method and complete your transaction securely</p>
-        </header>
+        
+        <!-- Payment Status Alert -->
+        <div id="payment-status" class="payment-status" style="display: none;"></div>
         
         <div class="payment-card">
             <div class="payment-card-header">
@@ -885,11 +700,6 @@
                         <h3>Bank Transfer</h3>
                         <p>Transfer from your bank account</p>
                     </div>
-                    <div class="payment-option" data-method="wallet" onclick="selectPaymentMethod('wallet')">
-                        <i class="fas fa-wallet"></i>
-                        <h3>Wallet Balance</h3>
-                        <p>Use your available balance</p>
-                    </div>
                     <div class="payment-option" data-method="receipt" onclick="selectPaymentMethod('receipt')">
                         <i class="fas fa-receipt"></i>
                         <h3>Upload Receipt</h3>
@@ -903,21 +713,21 @@
                         <h3>Card Details</h3>
                         <div class="form-group">
                             <label class="form-label">Card Number</label>
-                            <input type="text" class="form-control" placeholder="1234 5678 9012 3456" data-stripe="number">
+                            <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)">
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">Expiry Date</label>
-                                    <input type="text" class="form-control" placeholder="MM/YY" data-stripe="exp">
-                                </div>
+                        <div class="card-input-group">
+                            <div class="form-group">
+                                <label class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" maxlength="5" oninput="formatExpiryDate(this)">
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label">CVV</label>
-                                    <input type="text" class="form-control" placeholder="123" data-stripe="cvc">
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="4" oninput="validateCVV(this)">
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cardholder Name</label>
+                            <input type="text" class="form-control" id="cardholderName" placeholder="John Doe">
                         </div>
                         <button class="btn btn-primary btn-block" onclick="processPayment('card')">
                             <i class="fas fa-lock me-2"></i> Pay Now
@@ -933,30 +743,30 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Receipt (PDF or Image)</label>
-                            <div class="file-upload">
-                                <input type="file" id="receiptFile" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                                <label for="receiptFile" class="file-upload-label">
+                            <div class="file-upload" id="fileUploadArea">
+                                <input type="file" id="receiptFile" class="file-input" accept=".pdf,.jpg,.jpeg,.png,.webp">
+                                <div class="file-upload-label">
                                     <i class="fas fa-cloud-upload-alt me-2"></i>
                                     <span>Choose file or drag & drop</span>
-                                </label>
+                                </div>
                                 <div id="file-name" class="mt-2 text-muted">No file selected</div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Amount Paid (₦)</label>
-                            <input type="number" id="receiptAmount" class="form-control" placeholder="Enter amount" min="1" step="0.01" required>
+                            <input type="number" id="receiptAmount" class="form-control" placeholder="Enter amount" min="1" step="0.01" value="5375.00">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Transaction Date</label>
-                            <input type="date" id="transactionDate" class="form-control" required>
+                            <input type="date" id="transactionDate" class="form-control" value="">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Bank Name</label>
-                            <input type="text" id="bankName" class="form-control" placeholder="e.g., GTBank, First Bank" required>
+                            <input type="text" id="bankName" class="form-control" placeholder="e.g., GTBank, First Bank">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Transaction Reference</label>
-                            <input type="text" id="transactionRef" class="form-control" placeholder="Enter transaction reference" required>
+                            <input type="text" id="transactionRef" class="form-control" placeholder="Enter transaction reference">
                         </div>
                         <button type="button" class="btn btn-primary btn-block" onclick="submitReceipt()">
                             <i class="fas fa-upload me-2"></i> Submit Receipt
@@ -972,7 +782,8 @@
                                 <p><strong>Bank Name:</strong> Access Bank</p>
                                 <p><strong>Account Name:</strong> WaterBill NG</p>
                                 <p><strong>Account Number:</strong> 0123456789</p>
-                                <p class="text-muted">Use your account number as the reference</p>
+                                <p><strong>Reference:</strong> <span id="user-reference">WB-USER-001</span></p>
+                                <p class="text-muted">Use the reference above for your transfer</p>
                             </div>
                         </div>
                         <button class="btn btn-primary" onclick="processPayment('bank')">
@@ -984,9 +795,13 @@
                     <div id="wallet-payment" class="form-section">
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
-                            Your current wallet balance is: <strong>₦5,000.00</strong>
+                            Your current wallet balance is: <strong id="wallet-balance">₦5,000.00</strong>
                         </div>
-                        <button class="btn btn-primary" onclick="processPayment('wallet')">
+                        <div class="alert alert-warning" id="insufficient-balance" style="display: none;">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Insufficient wallet balance. Please use another payment method.
+                        </div>
+                        <button class="btn btn-primary" id="wallet-pay-btn" onclick="processPayment('wallet')">
                             <i class="fas fa-wallet me-2"></i> Pay with Wallet
                         </button>
                     </div>
@@ -996,350 +811,531 @@
                     <h4>Order Summary</h4>
                     <div class="summary-item">
                         <span class="summary-label">Subscription Plan</span>
-                        <span class="summary-value">Monthly Premium</span>
+                        <span class="summary-value" id="plan-name">Monthly Premium</span>
                     </div>
                     <div class="summary-item">
                         <span class="summary-label">Billing Cycle</span>
-                        <span class="summary-value">Monthly</span>
+                        <span class="summary-value" id="billing-cycle">Monthly</span>
                     </div>
                     <div class="summary-item">
                         <span class="summary-label">Amount</span>
-                        <span class="summary-value">₦5,000.00</span>
+                        <span class="summary-value" id="plan-amount">₦5,000.00</span>
                     </div>
                     <div class="summary-item">
                         <span class="summary-label">VAT (7.5%)</span>
-                        <span class="summary-value">₦375.00</span>
+                        <span class="summary-value" id="vat-amount">₦375.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Service Fee</span>
+                        <span class="summary-value" id="service-fee">₦0.00</span>
                     </div>
                     <div class="summary-item summary-total">
                         <span>Total Amount</span>
-                        <span>₦5,375.00</span>
+                        <span id="total-amount">₦5,375.00</span>
                     </div>
                 </div>
             </div>
         </div>
-            <h3>Current Subscription</h3>
-            <p>Status: <span id="subscription-status">Loading...</span></p>
-            <p>Ends: <span id="subscription-end">Loading...</span></p>
-            <p>Minimum Payment: ₦<span id="min-payment">Loading...</span></p>
-        </div>
-
-        <div id="alert-container"></div>
-
-        <h3>Choose Payment Duration</h3>
-        <div class="payment-options-row" id="payment-options">
-            <!-- Payment options will be loaded here -->
-        </div>
-
-        <div class="payment-form">
-            <form id="payment-form">
-                <div class="form-group">
-                    <label for="amount">Amount (₦)</label>
-                    <input type="number" id="amount" name="amount" required readonly>
-                </div>
-
-                <div class="form-group">
-                    <label for="method">Payment Method</label>
-                    <select id="method" name="method" required onchange="togglePaymentFields()">
-                        <option value="">Select Payment Method</option>
-                        <option value="paystack">Pay Online (Paystack)</option>
-                        <option value="bank_transfer">Bank Transfer (Manual Verification)</option>
-                        <option value="manual_upload">Upload Payment Receipt</option>
-                        <option value="cash">Cash Payment (Office Only)</option>
-                    </select>
-                </div>
-
-                <!-- Bank Transfer Details -->
-                <div id="bank-details" class="payment-method-details" style="display: none;">
-                    <div class="form-group">
-                        <h4>Bank Transfer Instructions</h4>
-                        <p>Please transfer to the following account:</p>
-                        <p><strong>Bank:</strong> Your Bank Name</p>
-                        <p><strong>Account Name:</strong> WaterBill NG</p>
-                        <p><strong>Account Number:</strong> 0123456789</p>
-                        <p><strong>Reference:</strong> <span id="payment-reference">WB-</span></p>
-                        <p class="text-muted">Please include the reference number in your transfer details.</p>
-                    </div>
-                </div>
-
-                <!-- Manual Upload Section -->
-                <div id="manual-upload" class="payment-method-details" style="display: none;">
-                    <div class="form-group">
-                        <label for="receipt">Upload Payment Receipt (PDF/Image)</label>
-                        <input type="file" id="receipt" name="receipt" accept=".pdf,.jpg,.jpeg,.png" class="form-control">
-                        <small class="form-text text-muted">Please upload a clear copy of your payment receipt (Max 5MB)</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="transaction-id">Transaction/Reference Number</label>
-                        <input type="text" id="transaction-id" name="transaction_id" class="form-control" placeholder="Enter transaction reference">
-                    </div>
-                    <div class="form-group">
-                        <label for="payment-date">Payment Date</label>
-                        <input type="date" id="payment-date" name="payment_date" class="form-control" max="">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn" id="payment-btn">Make Payment</button>
-            </form>
-        </div>
     </div>
 
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="payment.html" class="nav-link active">
+            <i class="fas fa-credit-card"></i>
+            <span>Pay</span>
+        </a>
+        <a href="history.html" class="nav-link">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+        </a>
+        <a href="report-fault.html" class="nav-link">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Report</span>
+        </a>
+        <a href="profile.html" class="nav-link">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
     <script>
-        let minPayment = 2000;
-        let selectedAmount = 0;
-        
-        // Handle file selection
-        document.getElementById('receiptFile').addEventListener('change', function(e) {
-            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file selected';
-            document.getElementById('file-name').textContent = fileName;
-        });
-        
-        // Handle drag and drop
-        const fileUpload = document.querySelector('.file-upload');
-        const fileInput = document.getElementById('receiptFile');
-        
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            fileUpload.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            fileUpload.addEventListener(eventName, highlight, false);
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-            fileUpload.addEventListener(eventName, unhighlight, false);
-        });
-        
-        fileUpload.addEventListener('drop', handleDrop, false);
-        
-        function highlight() {
-            fileUpload.classList.add('highlight');
-        }
-        
-        function unhighlight() {
-            fileUpload.classList.remove('highlight');
-        }
-        
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            fileInput.files = files;
-            document.getElementById('file-name').textContent = files[0].name;
-        }
-
+        // Authentication check
         document.addEventListener('DOMContentLoaded', async function() {
-            if (window.AuthGuard) {
-                const session = await AuthGuard.requireUser();
-                if (!session) return; // redirected
+            console.log('Payment page loaded, checking authentication...');
+            
+            // Check if user is authenticated
+            const isAuthenticated = await checkAuthentication();
+            
+            if (isAuthenticated) {
+                // Load payment data and initialize the page
+                await loadPaymentData();
+                initializePage();
             } else {
-                await checkAuth();
-            }
-            loadPaymentData();
-            setupForm();
-        });
-
-        async function checkAuth() {
-            try {
-                const response = await fetch('../../api/auth/check-session.php', { credentials: 'include' });
-                const result = await response.json();
-                
-                const role = (result.role || '').toLowerCase();
-                if (!result.authenticated || role === 'admin') {
-                    window.location.href = '../auth/login.html';
-                }
-            } catch (error) {
+                // Redirect to login if not authenticated
+                console.log('User not authenticated, redirecting to login...');
                 window.location.href = '../auth/login.html';
             }
+        });
+
+        // Authentication function
+        async function checkAuthentication() {
+            try {
+                console.log('Checking user authentication...');
+                
+                // In a real application, you would make an API call to check session
+                const response = await fetch('../../api/auth/check-session.php', {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Authentication failed');
+                }
+                
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    console.log('Authentication failed');
+                    return false;
+                }
+                
+                // Store user reference for bank transfer
+                if (data.user_id) {
+                    document.getElementById('user-reference').textContent = `WB-USER-${data.user_id.toString().padStart(3, '0')}`;
+                }
+                
+                console.log('User authenticated successfully');
+                return true;
+                
+            } catch (error) {
+                console.error('Authentication error:', error);
+                return false;
+            }
         }
 
-        // Load payment data from API
+        // Load payment data
         async function loadPaymentData() {
             try {
-                // In a real app, fetch from your API
-                // const response = await fetch('/api/user/payment-data');
-                // const data = await response.json();
+                console.log('Loading payment data...');
                 
-                // Mock data for demo
-                const mockData = {
+                // In a real application, you would fetch this from your API
+                const response = await fetch('../../api/user/payment-data.php', {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch payment data');
+                }
+                
+                const data = await response.json();
+                
+                // Update UI with loaded data
+                updatePaymentSummary(data);
+                
+                console.log('Payment data loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading payment data:', error);
+                // Use fallback data
+                const fallbackData = {
                     balance: 5000,
                     subscription: {
                         plan: 'Monthly Premium',
                         amount: 5000,
                         vat: 0.075,
-                        nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
-                    },
-                    paymentMethods: [
-                        { id: 'card', name: 'Credit/Debit Card', icon: 'fa-credit-card' },
-                        { id: 'bank', name: 'Bank Transfer', icon: 'fa-university' },
-                        { id: 'wallet', name: 'Wallet Balance', icon: 'fa-wallet' }
-                    ]
+                        service_fee: 0,
+                        billing_cycle: 'Monthly'
+                    }
                 };
-                
-                // Update UI with loaded data
-                updatePaymentSummary(mockData);
-                
-            } catch (error) {
-                console.error('Error loading payment data:', error);
-                showAlert('Failed to load payment information. Please try again.', 'error');
+                updatePaymentSummary(fallbackData);
+                showAlert('Using cached data. Some features may be limited.', 'warning');
             }
         }
-        
+
+        // Initialize page components
+        function initializePage() {
+            console.log('Initializing page components...');
+            
+            // Set up file upload handling
+            setupFileUpload();
+            
+            // Set default payment method
+            selectPaymentMethod('card');
+            
+            // Set today's date as default for transaction date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('transactionDate').value = today;
+            document.getElementById('transactionDate').setAttribute('max', today);
+            
+            console.log('Page initialization complete');
+        }
+
         // Update payment summary section
         function updatePaymentSummary(data) {
             if (!data || !data.subscription) return;
             
-            // Update subscription details
-            const statusElement = document.getElementById('subscription-status');
-            const endDateElement = document.getElementById('subscription-end');
-            
-            if (statusElement) {
-                statusElement.textContent = 'Active';
-            }
-            
-            if (endDateElement) {
-                endDateElement.textContent = data.subscription.nextBillingDate || 'N/A';
-            }
+            console.log('Updating payment summary with data:', data);
             
             // Update wallet balance if available
             if (data.balance !== undefined) {
-                const walletBalance = document.querySelector('#wallet-payment strong');
+                const walletBalance = document.getElementById('wallet-balance');
                 if (walletBalance) {
                     walletBalance.textContent = `₦${data.balance.toLocaleString()}.00`;
+                    
+                    // Check if balance is sufficient
+                    const totalAmount = parseFloat(data.subscription.amount) + 
+                                       parseFloat(data.subscription.amount * data.subscription.vat) +
+                                       parseFloat(data.subscription.service_fee || 0);
+                    
+                    if (data.balance < totalAmount) {
+                        document.getElementById('insufficient-balance').style.display = 'block';
+                        document.getElementById('wallet-pay-btn').disabled = true;
+                    }
+                }
+            }
+            
+            // Update subscription details
+            if (data.subscription) {
+                const planAmount = parseFloat(data.subscription.amount);
+                const vatAmount = planAmount * data.subscription.vat;
+                const serviceFee = parseFloat(data.subscription.service_fee || 0);
+                const totalAmount = planAmount + vatAmount + serviceFee;
+                
+                document.getElementById('plan-name').textContent = data.subscription.plan || 'Monthly Premium';
+                document.getElementById('billing-cycle').textContent = data.subscription.billing_cycle || 'Monthly';
+                document.getElementById('plan-amount').textContent = `₦${planAmount.toLocaleString()}.00`;
+                document.getElementById('vat-amount').textContent = `₦${vatAmount.toLocaleString()}.00`;
+                document.getElementById('service-fee').textContent = `₦${serviceFee.toLocaleString()}.00`;
+                document.getElementById('total-amount').textContent = `₦${totalAmount.toLocaleString()}.00`;
+                
+                // Update receipt amount field
+                document.getElementById('receiptAmount').value = totalAmount.toFixed(2);
+            }
+        }
+
+        // Select payment method
+        function selectPaymentMethod(method) {
+            console.log(`Selected payment method: ${method}`);
+            
+            // Hide all form sections
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove selected class from all options
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Show selected method and add selected class
+            const selectedOption = document.querySelector(`[data-method="${method}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+            
+            // Show corresponding form section
+            const formSection = document.getElementById(`${method}-payment`);
+            if (formSection) {
+                formSection.classList.add('active');
+            }
+        }
+
+        // Format card number with spaces
+        function formatCardNumber(input) {
+            let value = input.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = '';
+            
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += ' ';
+                }
+                formattedValue += value[i];
+            }
+            
+            input.value = formattedValue;
+        }
+
+        // Format expiry date as MM/YY
+        function formatExpiryDate(input) {
+            let value = input.value.replace(/\D/g, '');
+            
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            
+            input.value = value;
+        }
+
+        // Validate CVV (only numbers, max 4 digits)
+        function validateCVV(input) {
+            input.value = input.value.replace(/\D/g, '');
+        }
+
+        // Process payment
+        async function processPayment(method) {
+            console.log(`Processing ${method} payment`);
+            
+            // Validate form based on method
+            if (method === 'card' && !validateCardForm()) {
+                return;
+            }
+            
+            // Show loading state
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="spinner"></span> Processing...';
+            button.disabled = true;
+            
+            try {
+                // Prepare payment data
+                const paymentData = {
+                    method: method,
+                    amount: parseFloat(document.getElementById('receiptAmount').value || 5375.00),
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Add method-specific data
+                if (method === 'card') {
+                    paymentData.card = {
+                        number: document.getElementById('cardNumber').value.replace(/\s/g, ''),
+                        expiry: document.getElementById('expiryDate').value,
+                        cvv: document.getElementById('cvv').value,
+                        name: document.getElementById('cardholderName').value
+                    };
+                }
+                
+                // In a real application, you would send this to your API
+                const response = await fetch('../../api/payment/process.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentData),
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Payment processing failed');
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showPaymentStatus('Payment processed successfully!', 'success');
+                    
+                    // Redirect to success page or update UI
+                    setTimeout(() => {
+                        window.location.href = 'payment-success.html';
+                    }, 2000);
+                } else {
+                    throw new Error(result.message || 'Payment failed');
+                }
+                
+            } catch (error) {
+                console.error('Payment error:', error);
+                showPaymentStatus(`Payment failed: ${error.message}`, 'error');
+                
+                // Reset button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Validate card form
+        function validateCardForm() {
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const expiryDate = document.getElementById('expiryDate').value;
+            const cvv = document.getElementById('cvv').value;
+            const cardholderName = document.getElementById('cardholderName').value;
+            
+            if (cardNumber.length < 16) {
+                showPaymentStatus('Please enter a valid card number', 'error');
+                return false;
+            }
+            
+            if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
+                showPaymentStatus('Please enter a valid expiry date (MM/YY)', 'error');
+                return false;
+            }
+            
+            if (cvv.length < 3) {
+                showPaymentStatus('Please enter a valid CVV', 'error');
+                return false;
+            }
+            
+            if (!cardholderName.trim()) {
+                showPaymentStatus('Please enter cardholder name', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Submit receipt
+        async function submitReceipt() {
+            console.log('Submitting receipt...');
+            
+            const fileInput = document.getElementById('receiptFile');
+            const amount = document.getElementById('receiptAmount').value;
+            const date = document.getElementById('transactionDate').value;
+            const bank = document.getElementById('bankName').value;
+            const reference = document.getElementById('transactionRef').value;
+            
+            // Basic validation
+            if (!fileInput.files[0]) {
+                showPaymentStatus('Please select a receipt file to upload', 'error');
+                return;
+            }
+            
+            if (!amount || !date || !bank || !reference) {
+                showPaymentStatus('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Validate file type
+            const file = fileInput.files[0];
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+            if (!validTypes.includes(file.type)) {
+                showPaymentStatus('Please upload a valid file (PDF, JPG, PNG, WebP)', 'error');
+                return;
+            }
+            
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showPaymentStatus('File size must be less than 5MB', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="spinner"></span> Uploading...';
+            button.disabled = true;
+            
+            try {
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('receipt', file);
+                formData.append('amount', amount);
+                formData.append('date', date);
+                formData.append('bank', bank);
+                formData.append('reference', reference);
+                
+                // In a real application, you would send this to your API
+                const response = await fetch('../../api/payment/upload-receipt.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Receipt upload failed');
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showPaymentStatus('Receipt uploaded successfully! Your payment will be verified shortly.', 'success');
+                    
+                    // Reset form
+                    document.getElementById('receiptFile').value = '';
+                    document.getElementById('receiptAmount').value = '';
+                    document.getElementById('transactionDate').value = '';
+                    document.getElementById('bankName').value = '';
+                    document.getElementById('transactionRef').value = '';
+                    document.getElementById('file-name').textContent = 'No file selected';
+                    
+                    console.log('Receipt submitted successfully');
+                } else {
+                    throw new Error(result.message || 'Receipt upload failed');
+                }
+                
+            } catch (error) {
+                console.error('Receipt upload error:', error);
+                showPaymentStatus(`Upload failed: ${error.message}`, 'error');
+            } finally {
+                // Reset button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Set up file upload handling
+        function setupFileUpload() {
+            const fileInput = document.getElementById('receiptFile');
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const fileName = document.getElementById('file-name');
+            
+            // Handle file selection
+            fileInput.addEventListener('change', function(e) {
+                const selectedFile = e.target.files[0];
+                if (selectedFile) {
+                    fileName.textContent = `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)`;
+                } else {
+                    fileName.textContent = 'No file selected';
+                }
+            });
+            
+            // Handle drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileUploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileUploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileUploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            fileUploadArea.addEventListener('drop', handleDrop, false);
+            
+            function highlight() {
+                fileUploadArea.classList.add('highlight');
+            }
+            
+            function unhighlight() {
+                fileUploadArea.classList.remove('highlight');
+            }
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                fileInput.files = files;
+                
+                if (files.length) {
+                    const selectedFile = files[0];
+                    fileName.textContent = `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)`;
                 }
             }
         }
-        
-        function showAlert(message, type = 'info') {
-            const container = document.getElementById('alert-container');
-            if (!container) return;
+
+        // Show payment status
+        function showPaymentStatus(message, type) {
+            const statusElement = document.getElementById('payment-status');
+            statusElement.textContent = message;
+            statusElement.className = `payment-status ${type}`;
+            statusElement.style.display = 'block';
             
-            const alertTypes = {
-                success: 'alert-success',
-                error: 'alert-danger',
-                warning: 'alert-warning',
-                info: 'alert-info'
-            };
-            
-            const alertClass = alertTypes[type] || 'alert-info';
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert ${alertClass} alert-dismissible fade show`;
-            alertDiv.role = 'alert';
-            alertDiv.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-            
-            container.appendChild(alertDiv);
-            
-            // Auto-dismiss after 5 seconds
+            // Auto-hide after 5 seconds
             setTimeout(() => {
-                alertDiv.classList.remove('show');
-                setTimeout(() => {
-                    alertDiv.remove();
-                }, 150);
+                statusElement.style.display = 'none';
             }, 5000);
         }
+
+        // Show alert (for compatibility with existing code)
+        function showAlert(message, type) {
+            showPaymentStatus(message, type === 'error' ? 'error' : 'success');
+        }
     </script>
-    <script src="../assets/js/notify.js"></script>
-    <script src="../assets/js/auth-guard.js"></script>
-    <!-- Mobile footer intentionally removed from this page -->
-
-    <style>
-        .main-footer {
-            background: linear-gradient(135deg, #1a2746, #2e6fff);
-            color: white;
-            margin-top: 60px;
-            padding: 40px 0 20px;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-        }
-
-        .footer-section h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .footer-section h4 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            font-weight: 600;
-            color: #e0e7ff;
-        }
-
-        .footer-section p {
-            line-height: 1.6;
-            opacity: 0.9;
-        }
-
-        .footer-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 8px;
-        }
-
-        .footer-section ul li a {
-            color: #e0e7ff;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-section ul li a:hover {
-            color: #ffffff;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 15px;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .social-links a:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            margin-top: 30px;
-            padding-top: 20px;
-            text-align: center;
-            opacity: 0.8;
-        }
-
-        @media (max-width: 768px) {
-            .footer-content {
-                grid-template-columns: 1fr;
-                gap: 30px;
-                text-align: center;
-            }
-        }
-    </style>
 </body>
 </html>
