@@ -4,47 +4,41 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Set session cookie parameters for consistency
-$cookieParams = session_get_cookie_params();
-session_set_cookie_params([
-    'lifetime' => 3600 * 24 * 30, // 30 days
-    'path' => '/',
-    'domain' => $_SERVER['HTTP_HOST'],
-    'secure' => isset($_SERVER['HTTPS']),
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
-
 session_start();
-require_once '../includes/db_connect.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
-    exit;
-}
+$user_id = $_SESSION['user_id'];
 
 try {
-    $userId = $_SESSION['user_id'];
-    $firstName = $_POST['first_name'] ?? '';
-    $middleName = $_POST['middle_name'] ?? '';
-    $surname = $_POST['surname'] ?? '';
-    $flatNo = $_POST['flat_no'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $phone = $_POST['phone'] ?? '';
-    $currentPassword = $_POST['current_password'] ?? '';
-    $newPassword = $_POST['new_password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
+    // Include database connection - CORRECTED PATH
+    require_once __DIR__ . '/../includes/db_connect.php';
+
+    // Get POST data - handle both JSON and form data
+    $input = [];
+    if (isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] === 'application/json') {
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    } else {
+        $input = $_POST;
+    }
+    
+    $first_name = trim($input['first_name'] ?? '');
+    $middle_name = trim($input['middle_name'] ?? '');
+    $surname = trim($input['surname'] ?? '');
+    $flat_no = trim($input['flat_no'] ?? '');
+    $email = trim($input['email'] ?? '');
+    $phone = trim($input['phone'] ?? '');
+    $current_password = $input['current_password'] ?? '';
+    $new_password = $input['new_password'] ?? '';
 
     // Validate required fields
-    if (empty($firstName) || empty($middleName) || empty($surname) || empty($flatNo) || empty($email) || empty($phone) || empty($currentPassword)) {
-        echo json_encode(['success' => false, 'message' => 'All fields except new password are required']);
+    if (empty($first_name) || empty($surname) || empty($email) || empty($phone) || empty($current_password)) {
+        echo json_encode(['success' => false, 'message' => 'All fields except middle name are required']);
         exit;
     }
 
@@ -54,64 +48,74 @@ try {
         exit;
     }
 
-    // Validate phone
-    if (!preg_match('/^[0-9]{11}$/', $phone)) {
-        echo json_encode(['success' => false, 'message' => 'Phone number must be 11 digits']);
+    // Get current user data
+    $stmt = $pdo->prepare("SELECT password, email FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        echo json_encode(['success' => false, 'message' => 'User not found']);
         exit;
     }
 
     // Verify current password
-    $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
-    $stmt->execute([$userId]);
-    $user = $stmt->fetch();
-
-    if (!$user || !password_verify($currentPassword, $user['password'])) {
+    if (!password_verify($current_password, $user['password'])) {
         echo json_encode(['success' => false, 'message' => 'Current password is incorrect']);
         exit;
     }
 
-    // Check if email/phone already exists for other users
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (email = ? OR phone = ?) AND id != ?");
-    $stmt->execute([$email, $phone, $userId]);
-    if ($stmt->fetchColumn() > 0) {
-        echo json_encode(['success' => false, 'message' => 'Email or phone number already in use by another user']);
+    // Check if email is already taken by another user
+    $emailCheck = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+    $emailCheck->execute([$email, $user_id]);
+    if ($emailCheck->fetch()) {
+        echo json_encode(['success' => false, 'message' => 'Email is already taken by another user']);
         exit;
     }
 
-    // Validate new password if provided
-    if (!empty($newPassword)) {
-        if (strlen($newPassword) < 8) {
-            echo json_encode(['success' => false, 'message' => 'New password must be at least 8 characters']);
+    // Prepare update query
+    $updateFields = [
+        'first_name' => $first_name,
+        'middle_name' => $middle_name,
+        'surname' => $surname,
+        'flat_no' => $flat_no,
+        'email' => $email,
+        'phone' => $phone
+    ];
+
+    // Update password if provided
+    if (!empty($new_password)) {
+        if (strlen($new_password) < 6) {
+            echo json_encode(['success' => false, 'message' => 'New password must be at least 6 characters long']);
             exit;
         }
-        if ($newPassword !== $confirmPassword) {
-            echo json_encode(['success' => false, 'message' => 'New passwords do not match']);
-            exit;
-        }
+        $updateFields['password'] = password_hash($new_password, PASSWORD_DEFAULT);
     }
 
-    // Update profile
-    if (!empty($newPassword)) {
-        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE users SET first_name = ?, middle_name = ?, surname = ?, flat_no = ?, email = ?, phone = ?, password = ? WHERE id = ?");
-        $stmt->execute([$firstName, $middleName, $surname, $flatNo, $email, $phone, $hashedPassword, $userId]);
-    } else {
-        $stmt = $pdo->prepare("UPDATE users SET first_name = ?, middle_name = ?, surname = ?, flat_no = ?, email = ?, phone = ? WHERE id = ?");
-        $stmt->execute([$firstName, $middleName, $surname, $flatNo, $email, $phone, $userId]);
+    // Build dynamic update query
+    $setClause = [];
+    $params = [];
+    foreach ($updateFields as $field => $value) {
+        $setClause[] = "$field = ?";
+        $params[] = $value;
     }
+    $params[] = $user_id;
 
-    // Update session name
-    $_SESSION['name'] = $firstName . ' ' . $middleName . ' ' . $surname;
+    $sql = "UPDATE users SET " . implode(', ', $setClause) . " WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
 
     echo json_encode([
         'success' => true,
-        'message' => 'Profile updated successfully!'
+        'message' => 'Profile updated successfully'
     ]);
-    
+
 } catch (Exception $e) {
+    // Log the error but don't expose details to client
+    error_log("Update profile error: " . $e->getMessage());
+    
     echo json_encode([
         'success' => false,
-        'message' => 'Failed to update profile. Please try again.'
+        'message' => 'Failed to update profile'
     ]);
 }
 ?>

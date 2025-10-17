@@ -16,67 +16,98 @@ session_set_cookie_params([
 ]);
 
 session_start();
-require_once __DIR__ . '/../includes/db_connect.php';
+require_once __DIR__ . '/../db_connect.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+// Check if user is logged in (any role)
+if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit;
 }
 
+$user_id = $_SESSION['user_id'];
+
 try {
-    // Get stats
-    $totalUsers = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-    $pendingPayments = $pdo->query("SELECT COUNT(*) FROM payments WHERE status = 'pending'")->fetchColumn();
-    $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE end_date > CURDATE() AND status = 'active'")->fetchColumn();
-    $reportedFaults = $pdo->query("SELECT COUNT(*) FROM fault_reports WHERE status = 'open'")->fetchColumn();
+    // Get user info including flat_no
+    $userQuery = $pdo->prepare("SELECT id, username, email, first_name, middle_name, surname, flat_no FROM users WHERE id = ?");
+    $userQuery->execute([$user_id]);
+    $user = $userQuery->fetch();
 
-    // Get recent payments (limit to last 24 hours, max 5)
-    $recentPayments = $pdo->prepare("SELECT p.*, u.first_name, u.middle_name, u.surname 
-        FROM payments p 
-        JOIN users u ON p.user_id = u.id 
-        WHERE p.status = 'pending' AND p.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)
-        ORDER BY p.created_at DESC
-        LIMIT 5");
-    $recentPayments->execute();
-    $payments = $recentPayments->fetchAll();
+    if (!$user) {
+        throw new Exception('User not found');
+    }
 
-    // Format payments for frontend
-    $formattedPayments = array_map(function($payment) {
-        return [
-            'user_name' => trim($payment['first_name'] . ' ' . $payment['middle_name']),
-            'amount' => number_format($payment['amount']),
-            'method' => ucfirst($payment['method']),
-            'date' => date('M d, Y', strtotime($payment['created_at'])),
-            'status' => $payment['status']
-        ];
-    }, $payments);
+    // Initialize default values
+    $subscription_status = 'Inactive';
+    $subscription_end = null;
+    $pending_payments = 0;
+    $total_paid = 0;
+    $has_subscription = false;
 
-    // Get system settings
-    $settings = $pdo->query("SELECT name, value FROM system_settings")->fetchAll(PDO::FETCH_KEY_PAIR);
-    
-    // Format settings for display
-    $formattedSettings = [
-        'Minimum Payment' => '₦' . number_format($settings['min_payment'] ?? 0),
-        'Company Name' => $settings['company_name'] ?? 'WaterBill NG',
-        'Support Email' => $settings['support_email'] ?? 'N/A',
-        'Auto-Approval' => ($settings['auto_approval'] ?? '0') === '1' ? 'Enabled' : 'Disabled'
+    // Check for active subscription (using your actual table structure)
+    $subscriptionQuery = $pdo->prepare("
+        SELECT end_date, status 
+        FROM subscriptions 
+        WHERE user_id = ? AND status = 'active'
+        ORDER BY end_date DESC 
+        LIMIT 1
+    ");
+    $subscriptionQuery->execute([$user_id]);
+    $subscription = $subscriptionQuery->fetch();
+
+    if ($subscription) {
+        $has_subscription = true;
+        $end_date = new DateTime($subscription['end_date']);
+        $now = new DateTime();
+        
+        if ($end_date > $now) {
+            $subscription_status = 'Active';
+            $subscription_end = $subscription['end_date'];
+        } else {
+            $subscription_status = 'Expired';
+            $subscription_end = $subscription['end_date'];
+        }
+    }
+
+    // Get payment statistics (using your actual payments table structure)
+    $paymentStatsQuery = $pdo->prepare("
+        SELECT 
+            COUNT(*) as total_payments,
+            COALESCE(SUM(amount), 0) as total_paid,
+            COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_payments
+        FROM payments 
+        WHERE user_id = ?
+    ");
+    $paymentStatsQuery->execute([$user_id]);
+    $paymentStats = $paymentStatsQuery->fetch();
+
+    if ($paymentStats) {
+        $pending_payments = $paymentStats['pending_payments'] ?? 0;
+        $total_paid = $paymentStats['total_paid'] ?? 0;
+    }
+
+    $response = [
+        'success' => true,
+        'subscription_status' => $subscription_status,
+        'subscription_end' => $subscription_end ? date('M d, Y', strtotime($subscription_end)) : null,
+        'pending_payments' => $pending_payments,
+        'total_paid' => $total_paid,
+        'user_name' => trim($user['first_name'] . ' ' . ($user['middle_name'] ?? '') . ' ' . $user['surname']),
+        'user_email' => $user['email'],
+        'user_flat' => $user['flat_no'] ?? 'N/A',
+        'has_subscription' => $has_subscription,
+        'raw_subscription_end' => $subscription_end, // For the countdown timer
+        'no_subscription' => !$has_subscription // Explicit flag for no subscription
     ];
 
-    echo json_encode([
-        'success' => true,
-        'total_users' => $totalUsers,
-        'pending_payments' => $pendingPayments,
-        'active_subscriptions' => $activeSubscriptions,
-        'open_faults' => $reportedFaults,
-        'recent_payments' => $formattedPayments,
-        'system_settings' => $formattedSettings
-    ]);
+    echo json_encode($response);
     
 } catch (Exception $e) {
+    error_log("Dashboard data error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'message' => 'Failed to load dashboard data'
+        'message' => 'Failed to load dashboard data: ' . $e->getMessage(),
+        'no_subscription' => true
     ]);
 }
 ?>

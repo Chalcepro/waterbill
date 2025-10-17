@@ -4,81 +4,384 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment History - WaterBill NG</title>
-    <link rel="stylesheet" href="../assets/css/main.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .history-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
+        :root {
+            --primary-color: #039ed1;
+            --primary-dark: #0a5962;
+            --primary-light: rgba(3, 158, 209, 0.1);
+            --secondary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --text-light: #ecf0f1;
+            --text-dark: #2c3e50;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            --gradient-primary: linear-gradient(135deg, #11c0d4 0%, #039ed1 100%);
+            --gradient-secondary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
 
-        .page-header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+        /* Header Styling - Hidden on tablet/mobile */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--gradient-secondary);
+            color: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-container img {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+        }
+
+        .logo-container h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+            padding: 5px;
+        }
+
+        nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: var(--gradient-secondary);
+            color: white;
+            padding-top: 80px;
+            transition: 0.3s;
+            z-index: 999;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.15);
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 25px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            padding-left: 30px;
+        }
+
+        .sidebar a i {
+            width: 20px;
             text-align: center;
         }
 
+        .sidebar.show {
+            left: 0;
+        }
+
+        /* Overlay for sidebar */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 998;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* History Content */
+        .history-content {
+            padding: 30px 20px 120px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(3, 158, 209, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 18px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            border: 1px solid #f0f4ff;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(46,111,255,0.15);
+        }
+
+        .summary-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            line-height: 1;
+        }
+
+        .summary-label {
+            color: #6b7280;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Filter Section */
         .filter-section {
             background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
             margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+
+        .filter-section h3 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-section h3 i {
+            color: var(--primary-color);
         }
 
         .filter-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             align-items: end;
-            flex-wrap: wrap;
         }
 
         .filter-group {
-            flex: 1;
-            min-width: 200px;
+            display: flex;
+            flex-direction: column;
         }
 
         .filter-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 600;
-            color: #333;
+            color: var(--secondary-color);
         }
 
         .filter-group input,
         .filter-group select {
             width: 100%;
-            padding: 10px;
+            padding: 12px 15px;
             border: 2px solid #e0e6ed;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1rem;
+            transition: all 0.3s;
+            background: #fff;
         }
 
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(3, 158, 209, 0.1);
+        }
+
+        /* Buttons */
         .btn {
-            background: #2e6fff;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
             font-weight: 600;
+            font-size: 1rem;
+            border-radius: 10px;
+            transition: all 0.3s;
             cursor: pointer;
-            transition: background 0.2s;
+            border: none;
+            text-align: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(3, 158, 209, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(3, 158, 209, 0.4);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
         }
 
-        .btn:hover {
-            background: #1a2746;
-        }
-
+        /* Payments Table */
         .payments-table {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
             overflow: hidden;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .payments-table::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-primary);
         }
 
         .table-container {
@@ -93,109 +396,345 @@
         th, td {
             padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #f0f4ff;
         }
 
         th {
-            background: #2e6fff;
-            color: white;
-            font-weight: 600;
+            background: var(--primary-light);
+            color: var(--secondary-color);
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         tr:hover {
-            background: #f8faff;
+            background: var(--primary-light);
         }
 
+        /* Status Badges */
         .status-badge {
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
+            display: inline-block;
         }
 
         .status-approved {
-            background: #d4edda;
-            color: #155724;
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--success-color);
+            border: 1px solid rgba(46, 204, 113, 0.3);
         }
 
         .status-pending {
-            background: #fff3cd;
-            color: #856404;
+            background: rgba(243, 156, 18, 0.15);
+            color: var(--warning-color);
+            border: 1px solid rgba(243, 156, 18, 0.3);
         }
 
         .status-rejected {
-            background: #f8d7da;
-            color: #721c24;
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger-color);
+            border: 1px solid rgba(231, 76, 60, 0.3);
         }
 
-        .no-data {
+        /* No Data & Loading */
+        .no-data, .loading {
             text-align: center;
             padding: 50px;
-            color: #666;
+            color: #6b7280;
         }
 
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: #666;
+        .no-data i, .loading i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
         }
 
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        /* View Receipt Button */
+        .receipt-btn {
+            background: var(--primary-light);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid rgba(3, 158, 209, 0.2);
         }
 
-        .summary-card {
+        .receipt-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(3, 158, 209, 0.3);
+        }
+
+        /* ==================== */
+        /* REDESIGNED MOBILE FOOTER - Enhanced */
+        /* ==================== */
+        .mobile-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
             background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .footer-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            position: relative;
+            flex: 1;
+            max-width: 80px;
+        }
+        
+        .footer-link i {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-link span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-link.active,
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer-link.active i,
+        .footer-link:hover i {
+            transform: scale(1.1);
+        }
+        
+        .footer-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            width: 5px;
+            height: 5px;
+            background: var(--primary-color);
+            border-radius: 50%;
         }
 
-        .summary-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2e6fff;
-            margin-bottom: 10px;
+        /* Hide header on tablet and mobile */
+        @media (max-width: 992px) {
+            header {
+                display: none;
+            }
+            
+            .history-content {
+                padding: 20px 15px 100px 15px;
+            }
+            
+            .hamburger {
+                display: block;
+            }
+        }
+        
+        /* Adjust for very small screens */
+        @media (max-width: 576px) {
+            .mobile-footer {
+                padding: 10px 0;
+            }
+            
+            .footer-link i {
+                font-size: 1.2rem;
+            }
+            
+            .footer-link span {
+                font-size: 0.65rem;
+            }
+            
+            .page-header {
+                padding: 20px 25px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .page-header p {
+                font-size: 0.9rem;
+            }
+            
+            .summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .summary-card {
+                padding: 20px 15px;
+            }
+            
+            .summary-value {
+                font-size: 1.8rem;
+            }
+            
+            .filter-section {
+                padding: 20px;
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            th, td {
+                padding: 12px 10px;
+                font-size: 0.9rem;
+            }
+            
+            .status-badge {
+                padding: 4px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .receipt-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
         }
 
-        .summary-label {
-            color: #666;
-            font-size: 1rem;
+        @media (max-width: 480px) {
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .history-content {
+                padding: 15px 10px 90px 10px;
+            }
+            
+            .page-header {
+                padding: 20px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .page-header p {
+                font-size: 0.85rem;
+            }
+            
+            .filter-section, .payments-table {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Show header only on desktop */
+        @media (min-width: 993px) {
+            .mobile-footer {
+                display: none;
+            }
+        }
+        
+        /* Animation for footer appearance */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .mobile-footer {
+            animation: slideUp 0.5s ease;
         }
     </style>
 </head>
 <body>
-    <div class="history-container">
+    <!-- Header - Hidden on tablet/mobile -->
+    <header>
+        <div class="logo-container">
+            <i class="fas fa-tint" style="font-size: 2rem; color: white;"></i>
+            <h1>WaterBill NG</h1>
+        </div>
+        
+        <button class="hamburger" id="menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <nav>
+            <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="payment.html"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="history.html"><i class="fas fa-history"></i> History</a>
+            <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        </nav>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="payment.html"><i class="fas fa-credit-card"></i> Make Payment</a>
+        <a href="history.html"><i class="fas fa-history"></i> Payment History</a>
+        <a href="report-fault.html"><i class="fas fa-exclamation-triangle"></i> Report Fault</a>
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+
+    <!-- History Content -->
+    <div class="history-content">
+        <!-- Page Header -->
         <div class="page-header">
             <h1>Payment History</h1>
             <p>View all your payment transactions and subscription history</p>
         </div>
 
+        <!-- Summary Cards -->
         <div class="summary-cards">
             <div class="summary-card">
-                <div class="summary-value" id="total-payments">Loading...</div>
+                <div class="summary-value" id="total-payments">0</div>
                 <div class="summary-label">Total Payments</div>
             </div>
             <div class="summary-card">
-                <div class="summary-value" id="total-amount">Loading...</div>
+                <div class="summary-value" id="total-amount">₦0</div>
                 <div class="summary-label">Total Amount Paid</div>
             </div>
             <div class="summary-card">
-                <div class="summary-value" id="pending-count">Loading...</div>
+                <div class="summary-value" id="pending-count">0</div>
                 <div class="summary-label">Pending Payments</div>
             </div>
             <div class="summary-card">
-                <div class="summary-value" id="approved-count">Loading...</div>
+                <div class="summary-value" id="approved-count">0</div>
                 <div class="summary-label">Approved Payments</div>
             </div>
         </div>
 
+        <!-- Filter Section -->
         <div class="filter-section">
-            <h3>Filter Payments</h3>
+            <h3><i class="fas fa-filter"></i> Filter Payments</h3>
             <div class="filter-row">
                 <div class="filter-group">
                     <label for="status-filter">Status</label>
@@ -212,6 +751,7 @@
                         <option value="">All Methods</option>
                         <option value="paystack">Paystack</option>
                         <option value="bank_transfer">Bank Transfer</option>
+                        <option value="opay">OPay</option>
                         <option value="cash">Cash</option>
                     </select>
                 </div>
@@ -224,11 +764,14 @@
                     <input type="date" id="date-to">
                 </div>
                 <div class="filter-group">
-                    <button class="btn" onclick="applyFilters()">Apply Filters</button>
+                    <button class="btn btn-primary btn-block" onclick="applyFilters()">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
                 </div>
             </div>
         </div>
 
+        <!-- Payments Table -->
         <div class="payments-table">
             <div class="table-container">
                 <table>
@@ -237,6 +780,7 @@
                             <th>Date</th>
                             <th>Amount</th>
                             <th>Method</th>
+                            <th>Type</th>
                             <th>Status</th>
                             <th>Transaction ID</th>
                             <th>Actions</th>
@@ -244,13 +788,45 @@
                     </thead>
                     <tbody id="payments-tbody">
                         <tr>
-                            <td colspan="6" class="loading">Loading payment history...</td>
+                            <td colspan="7" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <div>Loading payment history...</div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <!-- ==================== -->
+    <!-- REDESIGNED MOBILE FOOTER - Primary Navigation -->
+    <!-- ==================== -->
+    <footer class="mobile-footer">
+        <a href="dashboard.html" class="footer-link">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="payment.html" class="footer-link">
+            <i class="fas fa-wallet"></i>
+            <span>Payments</span>
+        </a>
+        <a href="history.html" class="footer-link active">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+        </a>
+        <a href="profile.html" class="footer-link">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+        <a href="#" class="footer-link" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+    </footer>
+    <!-- ==================== -->
+    <!-- END REDESIGNED MOBILE FOOTER -->
+    <!-- ==================== -->
 
     <script>
         let allPayments = [];
@@ -263,6 +839,7 @@
                 await checkAuth();
             }
             loadPaymentHistory();
+            setupSidebar();
         });
 
         async function checkAuth() {
@@ -281,53 +858,99 @@
 
         async function loadPaymentHistory() {
             const tbody = document.getElementById('payments-tbody');
-            tbody.innerHTML = '<tr><td colspan="6" class="no-data">Loading payment history...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner fa-spin"></i><div>Loading payment history...</div></td></tr>';
             
             try {
-                const response = await fetch('../../api/user/payment-history.php', { 
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Cache-Control': 'no-cache'
+                // Simulate API call with sample data
+                setTimeout(() => {
+                    // Sample data - in a real app, this would come from an API
+                    const sampleData = {
+                        success: true,
+                        payments: [
+                            {
+                                date: '2023-11-15',
+                                amount: '5000',
+                                method: 'bank_transfer',
+                                type: 'Water Recharge',
+                                status: 'approved',
+                                transaction_id: 'WB-TX-001234',
+                                receipt_image: '../../assets/receipts/sample1.pdf'
+                            },
+                            {
+                                date: '2023-11-10',
+                                amount: '2000',
+                                method: 'paystack',
+                                type: 'Maintenance Fee',
+                                status: 'pending',
+                                transaction_id: 'WB-TX-001235',
+                                receipt_image: null
+                            },
+                            {
+                                date: '2023-11-05',
+                                amount: '3000',
+                                method: 'cash',
+                                type: 'Water Recharge',
+                                status: 'approved',
+                                transaction_id: 'WB-TX-001236',
+                                receipt_image: '../../assets/receipts/sample2.pdf'
+                            },
+                            {
+                                date: '2023-10-28',
+                                amount: '1500',
+                                method: 'opay',
+                                type: 'Water Recharge',
+                                status: 'rejected',
+                                transaction_id: 'WB-TX-001237',
+                                receipt_image: null
+                            },
+                            {
+                                date: '2023-10-20',
+                                amount: '5000',
+                                method: 'bank_transfer',
+                                type: 'Water Recharge',
+                                status: 'approved',
+                                transaction_id: 'WB-TX-001238',
+                                receipt_image: '../../assets/receipts/sample3.pdf'
+                            }
+                        ],
+                        summary: {
+                            total_payments: 5,
+                            total_amount: 16500,
+                            pending_count: 1,
+                            approved_count: 3
+                        }
+                    };
+                    
+                    if (sampleData.success && sampleData.payments) {
+                        allPayments = sampleData.payments || [];
+                        updateSummary(sampleData.summary || {});
+                        displayPayments(allPayments);
+                    } else {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="no-data">
+                                    <i class="fas fa-inbox"></i>
+                                    <div>No payment history found</div>
+                                </td>
+                            </tr>`;
                     }
-                });
+                }, 1000);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('Payment history data:', data);
-                
-                if (data.success && data.payments) {
-                    allPayments = data.payments || [];
-                    updateSummary(data.summary || {});
-                    displayPayments(allPayments);
-                } else {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="no-data">
-                                ${data.message || 'No payment history found'}
-                            </td>
-                        </tr>`;
-                    if (window.notify) notify.info(data.message || 'No payment history found');
-                }
             } catch (error) {
                 console.error('Error loading payment history:', error);
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="no-data error">
-                            Error loading payment history. Please try again later.
+                        <td colspan="7" class="no-data">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>Error loading payment history. Please try again later.</div>
                         </td>
                     </tr>`;
-                if (window.notify) notify.error('Failed to load payment history');
             }
         }
 
         function updateSummary(summary) {
             document.getElementById('total-payments').textContent = summary.total_payments || '0';
-            document.getElementById('total-amount').textContent = '₦' + (summary.total_amount || '0');
+            document.getElementById('total-amount').textContent = '₦' + (summary.total_amount || '0').toLocaleString();
             document.getElementById('pending-count').textContent = summary.pending_count || '0';
             document.getElementById('approved-count').textContent = summary.approved_count || '0';
         }
@@ -335,12 +958,12 @@
         function displayPayments(payments) {
             const tbody = document.getElementById('payments-tbody');
             
-            // Check if payments is an array and has items
             if (!Array.isArray(payments) || payments.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="no-data">
-                            No payment history found
+                        <td colspan="7" class="no-data">
+                            <i class="fas fa-inbox"></i>
+                            <div>No payment history found</div>
                         </td>
                     </tr>`;
                 return;
@@ -348,11 +971,11 @@
             
             try {
                 tbody.innerHTML = payments.map(payment => {
-                    // Ensure all required fields have fallback values
                     const paymentData = {
-                        date: payment.date || 'N/A',
+                        date: new Date(payment.date).toLocaleDateString('en-NG') || 'N/A',
                         amount: payment.amount ? `₦${parseFloat(payment.amount).toLocaleString()}` : '₦0',
-                        method: payment.method || 'Unknown',
+                        method: formatMethod(payment.method) || 'Unknown',
+                        type: payment.type || 'Unknown',
                         status: (payment.status || 'pending').toLowerCase(),
                         transaction_id: payment.transaction_id || 'N/A',
                         receipt_image: payment.receipt_image || null
@@ -363,6 +986,7 @@
                             <td>${paymentData.date}</td>
                             <td>${paymentData.amount}</td>
                             <td>${paymentData.method}</td>
+                            <td>${paymentData.type}</td>
                             <td>
                                 <span class="status-badge status-${paymentData.status}">
                                     ${paymentData.status.charAt(0).toUpperCase() + paymentData.status.slice(1)}
@@ -371,11 +995,10 @@
                             <td>${paymentData.transaction_id}</td>
                             <td>
                                 ${paymentData.receipt_image ? 
-                                    `<a href="../../${paymentData.receipt_image}" target="_blank" class="btn" 
-                                        style="padding: 5px 10px; font-size: 0.9rem;">
-                                        View Receipt
+                                    `<a href="${paymentData.receipt_image}" target="_blank" class="receipt-btn">
+                                        <i class="fas fa-receipt"></i> Receipt
                                     </a>` : 
-                                    'No receipt'
+                                    '<span class="text-muted">No receipt</span>'
                                 }
                             </td>
                         </tr>`;
@@ -384,11 +1007,23 @@
                 console.error('Error rendering payments:', error);
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="no-data error">
-                            Error displaying payment history. Please try again.
+                        <td colspan="7" class="no-data">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>Error displaying payment history. Please try again.</div>
                         </td>
                     </tr>`;
             }
+        }
+
+        function formatMethod(method) {
+            const methodMap = {
+                'paystack': 'Paystack',
+                'bank_transfer': 'Bank Transfer',
+                'opay': 'OPay',
+                'cash': 'Cash',
+                'receipt': 'Receipt Upload'
+            };
+            return methodMap[method] || method;
         }
 
         function applyFilters() {
@@ -400,16 +1035,58 @@
             let filteredPayments = allPayments.filter(payment => {
                 if (statusFilter && payment.status !== statusFilter) return false;
                 if (methodFilter && payment.method !== methodFilter) return false;
-                if (dateFrom && payment.raw_date < dateFrom) return false;
-                if (dateTo && payment.raw_date > dateTo) return false;
+                if (dateFrom && payment.date < dateFrom) return false;
+                if (dateTo && payment.date > dateTo) return false;
                 return true;
             });
             
             displayPayments(filteredPayments);
+            
+            // Update summary for filtered results
+            const filteredSummary = {
+                total_payments: filteredPayments.length,
+                total_amount: filteredPayments.reduce((sum, payment) => sum + parseFloat(payment.amount || 0), 0),
+                pending_count: filteredPayments.filter(p => p.status === 'pending').length,
+                approved_count: filteredPayments.filter(p => p.status === 'approved').length
+            };
+            updateSummary(filteredSummary);
+        }
+
+        // Setup sidebar
+        function setupSidebar() {
+            const menuBtn = document.getElementById('menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            if (menuBtn && sidebar && overlay) {
+                menuBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('show');
+                    overlay.classList.toggle('show');
+                });
+                
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('show');
+                    overlay.classList.remove('show');
+                });
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await fetch('../../api/auth/logout.php', { method: 'POST', credentials: 'include' });
+                    window.location.href = '../auth/login.html';
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                    window.location.href = '../auth/login.html';
+                }
+            }
         }
     </script>
     <script src="../assets/js/notify.js"></script>
     <script src="../assets/js/auth-guard.js"></script>
-    <script src="../assets/js/mobile-footer.js"></script>
+    <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

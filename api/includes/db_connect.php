@@ -1,5 +1,9 @@
 <?php
-require_once __DIR__ . '/../../config.php';
+// Database configuration
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'waterbill_db');
+define('DB_USER', 'root');
+define('DB_PASS', ''); // XAMPP default is empty password
 
 try {
     $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
@@ -8,7 +12,8 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 } catch (PDOException $e) {
-    // Do not echo/print here to avoid polluting API JSON responses
-    throw $e;
+    // Log error but don't display to user
+    error_log("Database connection error: " . $e->getMessage());
+    throw new Exception("Database connection failed");
 }
 ?>
